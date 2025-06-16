@@ -36,7 +36,6 @@ export const getProblems = async (req, res) => {
         const user = await User.findOne({ _id: userId });
         const handle = user.handle;
         const [resp, Problems] = await Promise.all([
-            
             fetch(`https://codeforces.com/api/user.status?handle=${handle}`),
             Problem.find({
                 $and: [
