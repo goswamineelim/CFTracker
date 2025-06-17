@@ -48,8 +48,6 @@ export const validate =  async (req, res) => {
         return res.status(500).json({"message" : "Internal Server Issue"});
     }
 }
-
-
 //get the handle from the body and then set a timeout for 5 mins before the object gets deleted and user needs to start again
 export const link = async (req, res) => {
     const {handle} = req.body;

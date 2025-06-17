@@ -9,6 +9,7 @@ import cors from "cors";
 import './lib/google.js';
 import session from 'express-session';
 import passport from 'passport';
+import manualAuthRoutes from "./routes/manualAuth.routes.js";
 
 const app = express();
 
@@ -39,6 +40,7 @@ app.use(
 app.use("/api/auth", authRoutes);
 app.use("/api/problems", problemRoutes);
 app.use("/api/link", linkRoute)
+app.use("/api/manual-auth", manualAuthRoutes);
 
 const PORT = process.env.PORT;
 
