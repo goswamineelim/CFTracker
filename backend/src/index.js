@@ -7,7 +7,6 @@ import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import './lib/google.js';
-import session from 'express-session';
 import passport from 'passport';
 
 const app = express();
@@ -20,14 +19,7 @@ app.get("/", (req, res) => {
 app.use(express.json());
 app.use(cookieParser());
 
-app.use(session({
-  secret: process.env.SESSION_SECRET || 'your_secret_key', // Replace with your own
-  resave: false,
-  saveUninitialized: false,
-}));
-
 app.use(passport.initialize());
-app.use(passport.session());
 
 app.use(
   cors({
