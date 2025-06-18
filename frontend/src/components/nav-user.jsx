@@ -29,6 +29,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
+import { useAuthStore } from "../store/useAuthStore"
 
 import {logoutUser } from "@/api/logoutCall"
 import { useNavigate } from 'react-router-dom';
@@ -36,6 +37,7 @@ export function NavUser({
   user
 }) {
   const { isMobile } = useSidebar()
+  const {logout} = useAuthStore();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -86,9 +88,10 @@ export function NavUser({
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onSelect={handleLogout} >
-              <LogOut />
-              Log out
+            <DropdownMenuItem>
+              <LogOut onClick={handleClick}/>
+              <button display="none" onClick={logout}>Log out</button>
+
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

@@ -3,7 +3,7 @@ import express from "express";
 import passport from "passport";
 import { generateToken } from "../lib/token.js";
 const router = express.Router();
-import {getInfo} from "../controllers/auth.controller.js"
+import {getInfo, login, logout, signup, verify} from "../controllers/auth.controller.js"
 import { protectRoute } from "../middleware/isAuth.js";
 
 // sends request to the google authentication server
@@ -20,5 +20,16 @@ router.get('/google/callback',
     }
 );
 
+// Signup request from user(manually)
+router.post("/signup", signup);
+
+//  Verify OTP
+router.post("/verify", verify);
+
+//  Login
+router.post("/login", login);
+
 router.get('/me',protectRoute, getInfo);
+
+router.post('/logout', logout)
 export default router;

@@ -9,9 +9,44 @@ export const useAuthStore = create((set, get) => ({
     isSigningUp: false,
     isLoggingIn : false,
     isUpdatingProfile: false,
-    loginG: () => {
+    loginGoogle: () => {
         set({isLoggingIn: true});
         window.location.href = `${API_URL}/auth/google`;
+    },
+    signup: async (data) => {
+        set({isSigningUp: true});
+        try{
+            const res = await axiosInstance.post(`${API_URL}/auth/signup`, data);
+            return res.data;
+        } catch(error){
+            console.error("Signup error ", error);
+        } finally {
+            set({isSigningUp: false});
+        }
+    },
+    validate: async (otp, navigate)=>{
+
+    },
+    login: async (data) => {
+        set({isLoggingIn: true});
+        try{
+            const res = await axiosInstance.post(`${API_URL}/auth/login`, data);
+            return res.data;
+        } catch(error){
+            console.error("Signup error ", error);
+        } finally {
+            set({isLoggingIn: false});
+        }
+    },
+    logout: async () => {
+        try{
+            await axiosInstance.post(`${API_URL}/auth/logout`);
+            set({authUser : null});
+        } catch(error){
+            console.error("Signup error ", error);
+        } finally {
+            set({isLoggingIn: false});
+        }
     },
     getUser: async () => {
         try{
