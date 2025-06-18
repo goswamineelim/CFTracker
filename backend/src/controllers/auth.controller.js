@@ -20,11 +20,12 @@ export const getInfo = async (req, res) => {
         if (!req.user) {
             return res.status(404).json({ message: "User not found" });
         }
-        console.log(req.user);
+        // console.log(req.user);
         return res.status(200).json({
             name : req.user.username, 
             handle: req.user.handle,
             email: req.user.email,
+            avatar: req.user.avatar,
         });
     } catch(error){
         res.status(500).json({"message" : "internal server Error"});
