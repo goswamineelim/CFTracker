@@ -55,7 +55,12 @@ export const login = async (req, res) => {
 
         generateToken(user._id, res);
 
-        res.status(200).json({ message: "Login successful", user });
+        res.status(200).json({ 
+            name: user.username,
+            email: user.email,
+            handle: user.handle,
+            avatar: req.user.avatar,
+        });
     } catch (err) {
         res.status(500).json({ message: "Login failed", error: err.message });
     }
@@ -90,8 +95,10 @@ export const verify = async (req, res) =>{
         delete otpStore[email]; // Clean up after successful verification
         generateToken(user._id, res);
         return res.status(200).json({
-            username: user.username,
-            email: user.email
+            name: user.username,
+            email: user.email,
+            handle: user.handle,
+            avatar: req.user.avatar,
         });
     } catch (err) {
         res.status(500).json({

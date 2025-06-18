@@ -14,7 +14,7 @@ export function VerifyOtp({
   const navigate = useNavigate();
   const { email, username, password } = state || {};
   const [otp, setOtp] = useState("");
-  const { authUser, validate } = useAuthStore();
+  const { getUser, validate } = useAuthStore();
   // change UI according to needs
   return (
     <div className="flex min-h-screen flex-col items-center justify-center p-6 md:p-10">
