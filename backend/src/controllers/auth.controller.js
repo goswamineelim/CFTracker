@@ -22,7 +22,6 @@ export const signup = async (req, res) => {
         const timeoutId = setTimeout(()=>{
             delete otpStore[email];
         }, 5 * 60 * 1000);
-        console.log(otp);
         otpStore[email] = {otp, timeoutId};
 
         await sendEmail(
@@ -48,7 +47,7 @@ export const login = async (req, res) => {
     try {
         const user = await User.findOne({ email });
 
-        if (!user || !user.isVerified)
+        if (!user)
             return res.status(400).json({ message: "Invalid credentials or unverified account" });
 
         const isMatch = await bcrypt.compare(password, user.password);
@@ -65,6 +64,7 @@ export const login = async (req, res) => {
 export const verify = async (req, res) =>{
     const {username, email, password, otp } = req.body;
     const stored = otpStore[email];
+    console.log(stored);
     if (!stored) {
         return res.status(400).json({
             message: "No OTP found. Please sign up again."
@@ -89,7 +89,7 @@ export const verify = async (req, res) =>{
         clearTimeout(stored.timeoutId)
         delete otpStore[email]; // Clean up after successful verification
         generateToken(user._id, res);
-        res.status(200).json({
+        return res.status(200).json({
             username: user.username,
             email: user.email
         });

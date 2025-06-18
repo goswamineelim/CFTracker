@@ -21,18 +21,11 @@ const userSchema = new mongoose.Schema(
         },
         avatar : {
             type: String,
-            required: true,
+            required: false,
         },
         provider : {
             type: String,
             required: true,
-        },
-        isVerified: { 
-            type: Boolean, 
-            default: false 
-        },
-        otp: { 
-            type: String 
         },
     },
     {timestamps: true}
