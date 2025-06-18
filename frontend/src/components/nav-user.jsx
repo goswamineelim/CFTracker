@@ -31,14 +31,19 @@ import {
 } from "@/components/ui/sidebar"
 import { useAuthStore } from "../store/useAuthStore"
 
+import {logoutUser } from "@/api/logoutCall"
+import { useNavigate } from 'react-router-dom';
 export function NavUser({
   user
 }) {
   const { isMobile } = useSidebar()
   const {logout} = useAuthStore();
-  const handleClick = () => {
-    console.log("Works");
-  }
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await logoutUser(); 
+    navigate('/login'); 
+  };
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -86,6 +91,7 @@ export function NavUser({
             <DropdownMenuItem>
               <LogOut onClick={handleClick}/>
               <button display="none" onClick={logout}>Log out</button>
+
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
