@@ -12,7 +12,7 @@ export function LoginForm({
   const {loginGoogle} = useAuthStore();
   const handleGoogleLogin = (e) => {
     e.preventDefault();
-    loginG(); 
+    loginGoogle(); 
   };
   return (
     <form className={cn("flex flex-col gap-6", className)} {...props}>
