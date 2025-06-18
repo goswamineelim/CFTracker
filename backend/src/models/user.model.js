@@ -19,6 +19,10 @@ const userSchema = new mongoose.Schema(
             type: String,
             unique: false,
         },
+        avatar : {
+            type: String,
+            required: true,
+        },
         provider : {
             type: String,
             required: true,
