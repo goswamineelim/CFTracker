@@ -48,6 +48,7 @@ export const useAuthStore = create((set, get) => ({
         set({isLoggingIn: true});
         try{
             const res = await axiosInstance.post(`${API_URL}/auth/login`, data);
+            set({authUser:res.data})
             return res.data;
         } catch(error){
             console.error("Signup error ", error);
