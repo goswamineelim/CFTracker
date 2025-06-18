@@ -9,6 +9,10 @@ export function LoginForm({
   ...props
 }) {
   const {loginG} = useAuthStore();
+  const handleGoogleLogin = (e) => {
+    e.preventDefault();
+    loginG(); 
+  };
   return (
     <form className={cn("flex flex-col gap-6", className)} {...props}>
       <div className="flex flex-col items-center gap-2 text-center">
@@ -40,7 +44,7 @@ export function LoginForm({
             Or continue with
           </span>
         </div>
-        <Button variant="outline" className="w-full" onClick={loginG}>
+        <Button variant="outline" className="w-full" onClick={handleGoogleLogin}>
           <img
             src="https://fonts.gstatic.com/s/i/productlogos/googleg/v6/24px.svg"
             alt="Google logo"
