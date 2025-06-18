@@ -29,12 +29,16 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
+import { useAuthStore } from "../store/useAuthStore"
 
 export function NavUser({
   user
 }) {
   const { isMobile } = useSidebar()
-
+  const {logout} = useAuthStore();
+  const handleClick = () => {
+    console.log("Works");
+  }
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -80,8 +84,8 @@ export function NavUser({
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
-              <LogOut />
-              Log out
+              <LogOut onClick={handleClick}/>
+              <button display="none" onClick={logout}>Log out</button>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
