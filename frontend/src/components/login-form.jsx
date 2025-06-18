@@ -3,19 +3,25 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useAuthStore } from "../store/useAuthStore"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
+import { useState } from "react"
 
 export function LoginForm({
   className,
   ...props
 }) {
-  const {loginGoogle} = useAuthStore();
-  const handleGoogleLogin = (e) => {
-    e.preventDefault();
-    loginGoogle(); 
-  };
+  const {loginGoogle, login} = useAuthStore();
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  })
+  const navigate = useNavigate();
   return (
-    <form className={cn("flex flex-col gap-6", className)} {...props}>
+    <form className={cn("flex flex-col gap-6", className)} {...props} onSubmit={(e) => {
+      e.preventDefault();
+      login(formData);
+      navigate("/");
+    }}>
       <div className="flex flex-col items-center gap-2 text-center">
         <h1 className="text-2xl font-bold">Login to your account</h1>
         <p className="text-muted-foreground text-sm text-balance">
@@ -25,7 +31,7 @@ export function LoginForm({
       <div className="grid gap-6">
         <div className="grid gap-3">
           <Label htmlFor="email">Email</Label>
-          <Input id="email" type="email" placeholder="m@example.com" required />
+          <Input id="email" type="email" placeholder="m@example.com" required onChange={(e)=>setFormData({...formData, email: e.target.value })}/>
         </div>
         <div className="grid gap-3">
           <div className="flex items-center">
@@ -34,7 +40,7 @@ export function LoginForm({
               Forgot your password?
             </a>
           </div>
-          <Input id="password" type="password" required />
+          <Input id="password" type="password" required onChange={(e)=>setFormData({...formData, password: e.target.value })}/>
         </div>
         <Button type="submit" className="w-full">
           Login
@@ -45,7 +51,10 @@ export function LoginForm({
             Or
           </span>
         </div>
-        <Button variant="outline" className="w-full" onClick={handleGoogleLogin}>
+        <Button variant="outline" className="w-full" onClick={(e) =>{
+          e.preventDefault();
+          loginGoogle();
+        }}>
           <img
             src="https://fonts.gstatic.com/s/i/productlogos/googleg/v6/24px.svg"
             alt="Google logo"
