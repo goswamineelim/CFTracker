@@ -25,6 +25,7 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar"
+import { useAuthStore } from "../store/useAuthStore"
 
 // This is sample data.
 const data = {
@@ -137,6 +138,7 @@ const data = {
 export function AppSidebar({
   ...props
 }) {
+  const {authUser} = useAuthStore();
   return (
     <Sidebar collapsible="icon" {...props}>
 
@@ -150,7 +152,7 @@ export function AppSidebar({
       </SidebarContent>
 
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={authUser} />
       </SidebarFooter>
 
       <SidebarRail />

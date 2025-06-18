@@ -13,8 +13,19 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
+import { useEffect } from "react"
+import { useAuthStore } from "../../store/useAuthStore"
 
 export default function Page() {
+  const {getUser, authUser} = useAuthStore();
+  useEffect(() => {
+    getUser();
+    console.log(authUser);
+  }, []);
+  
+  useEffect(() => {
+    console.log("Auth user changed:", authUser);
+  }, [authUser]);
   return (
     <SidebarProvider>
       <AppSidebar />

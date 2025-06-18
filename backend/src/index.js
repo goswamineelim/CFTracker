@@ -18,16 +18,16 @@ app.get("/", (req, res) => {
 });
 
 app.use(express.json());
-app.use(cookieParser());
 
 app.use(passport.initialize());
 
 app.use(
   cors({
-    origin: "http://localhost:5000",
-    credentials: true,
+    origin: "http://localhost:5173",
+    credentials: true
   })
 );
+app.use(cookieParser());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/problems", problemRoutes);

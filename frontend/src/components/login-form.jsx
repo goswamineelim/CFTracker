@@ -2,11 +2,13 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { useAuthStore } from "../store/useAuthStore"
 
 export function LoginForm({
   className,
   ...props
 }) {
+  const {loginG} = useAuthStore();
   return (
     <form className={cn("flex flex-col gap-6", className)} {...props}>
       <div className="flex flex-col items-center gap-2 text-center">
@@ -38,7 +40,7 @@ export function LoginForm({
             Or continue with
           </span>
         </div>
-        <Button variant="outline" className="w-full">
+        <Button variant="outline" className="w-full" onClick={loginG}>
           <img
             src="https://fonts.gstatic.com/s/i/productlogos/googleg/v6/24px.svg"
             alt="Google logo"

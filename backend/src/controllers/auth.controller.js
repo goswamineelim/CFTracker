@@ -14,6 +14,22 @@ dotenv.config();
 
 // }
 
+export const getInfo = async (req, res) => {
+    console.log(req.user);
+    try{
+        if (!req.user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        console.log(req.user);
+        return res.status(200).json({
+            name : req.user.username, 
+            handle: req.user.handle,
+            email: req.user.email,
+        });
+    } catch(error){
+        res.status(500).json({"message" : "internal server Error"});
+    }
+}
 
 export const logout = () => {
     try {
