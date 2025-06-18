@@ -12,13 +12,15 @@ async function (accessToken, refreshToken , profile, cb) {
     try {
         const email = profile.emails?.[0]?.value;
         const username = profile.displayName;
+        const avatar   = profile.photos?.[0]?.value;
         let user = await User.findOne({ provider: "google", email });
         // sign the user up
         if (!user) {
             user = new User({
                 provider: "google",
                 email,
-                username
+                username,
+                avatar,
             });
             await user.save();
         }

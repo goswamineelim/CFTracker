@@ -9,6 +9,7 @@ export const useAuthStore = create((set, get) => ({
     isSigningUp: false,
     isLoggingIn : false,
     isUpdatingProfile: false,
+    isValidating: false,
     loginGoogle: () => {
         set({isLoggingIn: true});
         window.location.href = `${API_URL}/auth/google`;
@@ -24,8 +25,24 @@ export const useAuthStore = create((set, get) => ({
             set({isSigningUp: false});
         }
     },
-    validate: async (otp, navigate)=>{
-
+    validate: async ({ username, password, otp, email }) => {
+        set({isValidating: true});
+        try {
+          const res = await axiosInstance.post(`${API_URL}/auth/verify`, {
+            username,
+            password,
+            otp,
+            email,
+          });
+      
+          // Set user on successful validation
+          set({ authUser: res.data.user });
+          return res.data;
+        } catch (error) {
+            console.error("Validation error", error);
+        } finally {            
+            set({isValidating: false})
+        }
     },
     login: async (data) => {
         set({isLoggingIn: true});
@@ -43,9 +60,7 @@ export const useAuthStore = create((set, get) => ({
             await axiosInstance.post(`${API_URL}/auth/logout`);
             set({authUser : null});
         } catch(error){
-            console.error("Signup error ", error);
-        } finally {
-            set({isLoggingIn: false});
+            console.error("Logout error ", error);
         }
     },
     getUser: async () => {

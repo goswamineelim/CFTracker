@@ -88,10 +88,9 @@ export function NavUser({
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <LogOut onClick={handleClick}/>
-              <button display="none" onClick={logout}>Log out</button>
-
+            <DropdownMenuItem onSelect={handleLogout}>
+              <LogOut />
+              Log out
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
