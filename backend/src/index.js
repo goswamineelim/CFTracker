@@ -34,6 +34,17 @@ app.use("/api/problems", problemRoutes);
 app.use("/api/link", linkRoute)
 app.use("/api/manual-auth", manualAuthRoutes);
 
+
+app.post('/api/logout', (req, res) => {
+  res.clearCookie('jwt', {
+    httpOnly: true,
+    secure: true,        // true in production (with HTTPS)
+    sameSite: 'Strict',
+    path: '/',
+  });
+  res.status(200).json({ message: 'Logged out' });
+});
+
 const PORT = process.env.PORT;
 
 app.listen(PORT, () => {
