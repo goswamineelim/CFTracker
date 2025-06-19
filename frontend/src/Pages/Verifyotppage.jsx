@@ -1,14 +1,16 @@
-"use client"
+"use client";
 
-import React, { useState, useEffect } from "react"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { toast } from "sonner"
-import { OTPInput, OTPInputContext } from "input-otp"
-import { FaLock } from "react-icons/fa"
+import React, { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
+import { OTPInput, OTPInputContext } from "input-otp";
+import { FaLock } from "react-icons/fa";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useAuthStore } from "../store/useAuthStore";
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -17,7 +19,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
+} from "@/components/ui/form";
 
 const InputOTP = React.forwardRef(({ className = "", containerClassName = "", ...props }, ref) => (
   <OTPInput
@@ -26,12 +28,12 @@ const InputOTP = React.forwardRef(({ className = "", containerClassName = "", ..
     className={`disabled:cursor-not-allowed ${className}`}
     {...props}
   />
-))
-InputOTP.displayName = "InputOTP"
+));
+InputOTP.displayName = "InputOTP";
 
 const InputOTPSlot = React.forwardRef(({ index, className = "", ...props }, ref) => {
-  const inputOTPContext = React.useContext(OTPInputContext)
-  const { char, hasFakeCaret, isActive } = inputOTPContext.slots[index]
+  const inputOTPContext = React.useContext(OTPInputContext);
+  const { char, hasFakeCaret, isActive } = inputOTPContext.slots[index];
 
   return (
     <div
@@ -49,70 +51,92 @@ const InputOTPSlot = React.forwardRef(({ index, className = "", ...props }, ref)
         </div>
       )}
     </div>
-  )
-})
-InputOTPSlot.displayName = "InputOTPSlot"
+  );
+});
+InputOTPSlot.displayName = "InputOTPSlot";
 
 const InputOTPGroup = ({ children }) => (
   <div className="flex items-center gap-2">{children}</div>
-)
+);
 
 const FormSchema = z.object({
   pin: z.string().min(6, { message: "Your one-time password must be 6 characters." }),
-})
+});
 
 export default function OTPPage() {
+  const { state } = useLocation();
+  const navigate = useNavigate();
+  const { email, username, password } = state || {}; 
+
+  // Initialize OTP state
+  const [otp, setOtp] = useState("");
+  const { getUser, validate, resendOTP } = useAuthStore();
+
   const form = useForm({
     resolver: zodResolver(FormSchema),
     defaultValues: {
       pin: "",
     },
-  })
+  });
 
-  const onSubmit = (data) => {
-    toast("OTP Submitted", {
-      description: (
-        <pre className="mt-2 w-[320px] rounded-md bg-neutral-950 p-4 text-white">
-          <code>{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
-    })
+const onSubmit = async (data) => {
+
+  try {
+    const validationResult = await validate({
+      email, 
+      username, 
+      password, 
+      otp: data.pin
+    });
+    if (validationResult) {
+      navigate("/");
+    } else {
+      console.error("Invalid OTP or Credentials!");
+      toast.error("Invalid OTP or Credentials!"); 
+    }
+  } catch (error) {
+    console.error("Validation error", error);
+    toast.error("An error occurred during validation. Please try again later.");
   }
+};
 
-  const [timeLeft, setTimeLeft] = useState(0)
-  const [isResending, setIsResending] = useState(false)
+  // OTP expiry timer logic
+  const [timeLeft, setTimeLeft] = useState(0);
+  const [isResending, setIsResending] = useState(false);
+
   useEffect(() => {
-    const storedExpiry = localStorage.getItem("otp_expiry")
-    let expiry = storedExpiry ? parseInt(storedExpiry, 10) : null
+    const storedExpiry = localStorage.getItem("otp_expiry");
+    let expiry = storedExpiry ? parseInt(storedExpiry, 10) : null;
 
     if (!expiry || isNaN(expiry) || expiry < Date.now()) {
-      expiry = Date.now() + 5 * 60 * 1000 // 5 minutes from now
-      localStorage.setItem("otp_expiry", expiry.toString())
+      expiry = Date.now() + 5 * 60 * 1000; // 5 minutes from now
+      localStorage.setItem("otp_expiry", expiry.toString());
     }
 
     const interval = setInterval(() => {
-      const newTimeLeft = Math.max(0, Math.floor((expiry - Date.now()) / 1000))
-      setTimeLeft(newTimeLeft)
-    }, 1000)
+      const newTimeLeft = Math.max(0, Math.floor((expiry - Date.now()) / 1000));
+      setTimeLeft(newTimeLeft);
+    }, 1000);
 
-    return () => clearInterval(interval)
-  }, [localStorage.getItem("otp_expiry")])
+    return () => clearInterval(interval);
+  }, [localStorage.getItem("otp_expiry")]);
 
-  const minutes = Math.floor(timeLeft / 60)
-  const seconds = timeLeft % 60
+  const minutes = Math.floor(timeLeft / 60);
+  const seconds = timeLeft % 60;
 
-  const isResendEnabled = timeLeft <= 240 // enable when <= 4 min left (after 1 min)
-  const handleResendOTP = () => {
-    if (!isResendEnabled) return
+  const isResendEnabled = timeLeft <= 240; // enable when <= 4 min left (after 1 min)
 
-    const newExpiry = Date.now() + 5 * 60 * 1000
-    localStorage.setItem("otp_expiry", newExpiry.toString())
-    toast.success("OTP resent successfully")
-    setIsResending(true)
+  const handleResendOTP = async () => {
+    if (!isResendEnabled) return;
+    await resendOTP(email)
+    const newExpiry = Date.now() + 5 * 60 * 1000;
+    localStorage.setItem("otp_expiry", newExpiry.toString());
+    toast.success("OTP resent successfully");
+    setIsResending(true);
     setTimeout(() => {
-      setIsResending(false)
-    }, 5000)
-  }
+      setIsResending(false);
+    }, 5000);
+  };
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center p-6 md:p-10">
@@ -145,7 +169,6 @@ export default function OTPPage() {
                     </InputOTP>
                   </FormControl>
 
-
                   <div className="flex justify-between items-center text-sm text-muted-foreground mt-1">
                     <span>Enter the OTP sent to your email.</span>
                     <button
@@ -153,8 +176,8 @@ export default function OTPPage() {
                       onClick={handleResendOTP}
                       disabled={!isResendEnabled || isResending}
                       className={`ml-2 underline-offset-2 ${isResendEnabled
-                          ? "hover:underline text-primary"
-                          : "cursor-not-allowed text-muted-foreground"
+                        ? "hover:underline text-primary"
+                        : "cursor-not-allowed text-muted-foreground"
                         }`}
                     >
                       Resend OTP
@@ -171,11 +194,10 @@ export default function OTPPage() {
           </form>
         </Form>
 
-
         <div className="text-center text-sm text-muted-foreground mt-2">
           Time remaining: {minutes}:{seconds < 10 ? `0${seconds}` : seconds}
         </div>
       </div>
     </div>
-  )
+  );
 }

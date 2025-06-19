@@ -14,13 +14,24 @@ export function VerifyOtp({
   const navigate = useNavigate();
   const { email, username, password } = state || {};
   const [otp, setOtp] = useState("");
-  const { getUser, validate } = useAuthStore();
+  const { authUser,getUser, validate } = useAuthStore();
+  
   // change UI according to needs
   const handleSubmit = async (e) => {
-      e.preventDefault(); 
-      await validate({email, username, password, otp});
-      navigate("/");
+  e.preventDefault(); 
+
+  const user = await validate({ email, username, password, otp });
+
+  if (user) {
+    // Optionally re-fetch with getUser() or just use user directly
+    console.log(user); // Confirm the user is available
+    navigate("/");
+  } else {
+    console.error("OTP validation failed.");
+    // Show a toast or UI error
   }
+};
+
   return (
     <div className="flex min-h-screen flex-col items-center justify-center p-6 md:p-10">
       <div className="w-full max-w-xs">
