@@ -14,7 +14,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar"
 import { useEffect } from "react"
-import { useAuthStore } from "../../store/useAuthStore"
+import { useAuthStore } from "@/store/useAuthStore"
 
 export default function Page() {
   const {getUser, authUser} = useAuthStore();
