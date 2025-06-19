@@ -12,18 +12,23 @@ export function SignupForm({
 }) {
   const navigate = useNavigate();
   const {signup, loginGoogle, isSigningUp} = useAuthStore();
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  })
-  const handleSubmit = async (e) => {
-    signup(formData);
+  async function handleSubmit(formData) {
+    const data ={
+      username: formData.get("username"),
+      email: formData.get("email"),
+      password: formData.get("password")
+    }
+    signup(data);
     navigate("/verify-otp", {
-      state: formData
+      state: data
     });
   }
+  const handleLoginWithGoogle = (e) => {
+    e.preventDefault();
+    loginGoogle();
+  }
   return (
-    <form className={cn("flex flex-col gap-6", className)} {...props} onSubmit={handleSubmit}>
+    <form className={cn("flex flex-col gap-6", className)} {...props} action={handleSubmit}>
       <div className="flex flex-col items-center gap-2 text-center">
         <h1 className="text-2xl font-bold">Sign Up</h1>
         <p className="text-muted-foreground text-sm text-balance">
@@ -33,17 +38,17 @@ export function SignupForm({
       <div className="grid gap-6">
       <div className="grid gap-3">
           <Label htmlFor="email">Username</Label>
-          <Input id="email" type="email" placeholder="m@example.com" required value={formData.username} onChange={(e)=>setFormData({...formData, username: e.target.value })}/>
+          <Input id="email" name="username" placeholder="m@example.com" required />
         </div>
         <div className="grid gap-3">
           <Label htmlFor="email">Email</Label>
-          <Input id="email" type="email" placeholder="m@example.com" required value={formData.email} onChange={(e)=>setFormData({...formData, email: e.target.value })}/>
+          <Input id="email" name="email" type="email" placeholder="m@example.com" required />
         </div>
         <div className="grid gap-3">
           <div className="flex items-center">
             <Label htmlFor="password">Password</Label>
           </div>
-          <Input id="password" type="password" required value={formData.password} onChange={(e)=>setFormData({...formData, password: e.target.value })}/>
+          <Input id="password" name="password" type="password" required />
         </div>
         <Button type="submit" className="w-full">
           Create Account
@@ -54,7 +59,7 @@ export function SignupForm({
             Or
           </span>
         </div>
-        <Button variant="outline" className="w-full" onClick={loginGoogle}>
+        <Button variant="outline" className="w-full" onClick={handleLoginWithGoogle}>
           <img
             src="https://fonts.gstatic.com/s/i/productlogos/googleg/v6/24px.svg"
             alt="Google logo"
