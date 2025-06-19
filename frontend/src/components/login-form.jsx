@@ -43,7 +43,7 @@ export function LoginForm({
               Forgot your password?
             </a>
           </div>
-          <Input id="password" name="password" type="password" required />
+          <Input id="password" name="password" type="password" placeholder="******" required />
         </div>
         <Button type="submit" className="w-full" >
           Login
@@ -63,9 +63,9 @@ export function LoginForm({
           Login with Google
         </Button>
       </div>
-      <div className="text-center text-sm">
+      <div className="text-center text-sm ">
         Don&apos;t have an account?{" "}
-        <Link to="/signup" className="link link-primary">
+        <Link to="/signup" className="link link-primary underline-offset-4 hover:underline">
           Sign up
         </Link>
       </div>
