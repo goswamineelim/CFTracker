@@ -31,7 +31,6 @@ import {
 } from "@/components/ui/sidebar"
 import { useAuthStore } from "../store/useAuthStore"
 
-import {logoutUser } from "@/api/logoutCall"
 import { useNavigate } from 'react-router-dom';
 export function NavUser({
   user
@@ -41,7 +40,7 @@ export function NavUser({
   const navigate = useNavigate();
 
   const handleLogout = async () => {
-    await logoutUser(); 
+    await logout(); 
     navigate('/login'); 
   };
   return (

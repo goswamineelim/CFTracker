@@ -18,13 +18,27 @@ export const useAuthStore = create((set, get) => ({
         set({isSigningUp: true});
         try{
             const res = await axiosInstance.post(`${API_URL}/auth/signup`, data);
-            return res.data;
+            return true;
         } catch(error){
             console.error("Signup error ", error);
+            return false;
         } finally {
             set({isSigningUp: false});
         }
     },
+    resendOTP: async (email) => {
+        set({ isResending: true }); // optional loading flag in store
+        try {
+            const res = await axiosInstance.post(`${API_URL}/auth/resend`, { email });
+            return true;
+        } catch (error) {
+            console.error("Resend OTP error:", error);
+            return false;
+        } finally {
+            set({ isResending: false });
+        }
+    },
+
     validate: async ({ username, password, otp, email }) => {
         set({isValidating: true});
         try {
@@ -34,12 +48,13 @@ export const useAuthStore = create((set, get) => ({
             otp,
             email,
           });
-      
+          console.log(res.data);
           // Set user on successful validation
-          set({ authUser: res.data.user });
-          return res.data;
+          set({ authUser: res.data });
+          return true;
         } catch (error) {
             console.error("Validation error", error);
+            return false;
         } finally {            
             set({isValidating: false})
         }
@@ -48,9 +63,11 @@ export const useAuthStore = create((set, get) => ({
         set({isLoggingIn: true});
         try{
             const res = await axiosInstance.post(`${API_URL}/auth/login`, data);
-            return res.data;
+            set({authUser:res.data})
+            return true;
         } catch(error){
             console.error("Signup error ", error);
+            return false;
         } finally {
             set({isLoggingIn: false});
         }
@@ -59,8 +76,10 @@ export const useAuthStore = create((set, get) => ({
         try{
             await axiosInstance.post(`${API_URL}/auth/logout`);
             set({authUser : null});
+            return true;
         } catch(error){
             console.error("Logout error ", error);
+            return false;
         }
     },
     getUser: async () => {

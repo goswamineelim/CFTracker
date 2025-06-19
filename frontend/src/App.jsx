@@ -1,11 +1,12 @@
 
-import Homepage from './Pages/Homepage/Homepage.jsx'
-import LoginPage from './Pages/Loginpage/Loginpage.jsx'
+import Homepage from '@/Pages/Homepage.jsx'
+import LoginPage from '@/Pages/Loginpage.jsx'
 import { Route ,Routes,useLocation } from "react-router-dom"
-import { useAuthStore } from './store/useAuthStore.js'
+import { useAuthStore } from '@/store/useAuthStore.js'
 import { useEffect } from 'react';
-import SignUppage from "./Pages/Loginpage/SignUppage.jsx"
-import {VerifyOtp} from "./components/otp.jsx";
+import SignUppage from "@/Pages/SignUppage.jsx"
+import VerifyOtp from "@/Pages/Verifyotppage.jsx"
+
 
 export default function App() {
   const {authUser, getUser} = useAuthStore();
