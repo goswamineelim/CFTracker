@@ -16,12 +16,17 @@ export function LoginForm({
     password: "",
   })
   const navigate = useNavigate();
+  const handleLogin = (e) => {
+    e.preventDefault();
+    login(formData);
+    navigate("/");
+  }
+  const handleLoginWithGoogle = (e) => {
+    e.preventDefault();
+    loginGoogle();
+  }
   return (
-    <form className={cn("flex flex-col gap-6", className)} {...props} onSubmit={(e) => {
-      e.preventDefault();
-      login(formData);
-      navigate("/");
-    }}>
+    <form className={cn("flex flex-col gap-6", className)} {...props}>
       <div className="flex flex-col items-center gap-2 text-center">
         <h1 className="text-2xl font-bold">Login to your account</h1>
         <p className="text-muted-foreground text-sm text-balance">
@@ -42,7 +47,7 @@ export function LoginForm({
           </div>
           <Input id="password" type="password" required onChange={(e)=>setFormData({...formData, password: e.target.value })}/>
         </div>
-        <Button type="submit" className="w-full">
+        <Button type="submit" className="w-full" onClick={handleLogin}>
           Login
         </Button>
         <div
@@ -51,10 +56,7 @@ export function LoginForm({
             Or
           </span>
         </div>
-        <Button variant="outline" className="w-full" onClick={(e) =>{
-          e.preventDefault();
-          loginGoogle();
-        }}>
+        <Button variant="outline" className="w-full" onClick={handleLoginWithGoogle}>
           <img
             src="https://fonts.gstatic.com/s/i/productlogos/googleg/v6/24px.svg"
             alt="Google logo"

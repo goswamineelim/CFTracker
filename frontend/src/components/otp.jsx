@@ -16,16 +16,15 @@ export function VerifyOtp({
   const [otp, setOtp] = useState("");
   const { getUser, validate } = useAuthStore();
   // change UI according to needs
+  const handleSubmit = async (e) => {
+      e.preventDefault(); 
+      await validate({email, username, password, otp});
+      navigate("/");
+  }
   return (
     <div className="flex min-h-screen flex-col items-center justify-center p-6 md:p-10">
       <div className="w-full max-w-xs">
-        <form className={cn("flex flex-col gap-6", className)} {...props} onSubmit={
-          async (e) => {
-            e.preventDefault(); 
-            await validate({email, username, password, otp});
-            navigate("/");
-          }
-        }>
+        <form className={cn("flex flex-col gap-6", className)} {...props} onSubmit={handleSubmit}>
         <div className="flex flex-col items-center gap-2 text-center">
           <h1 className="text-2xl font-bold">Enter verification code sent to {email}</h1>
         </div>

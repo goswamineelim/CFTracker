@@ -17,14 +17,13 @@ export function SignupForm({
     password: "",
   })
   const handleSubmit = async (e) => {
-    e.preventDefault();
     signup(formData);
     navigate("/verify-otp", {
       state: formData
-    })
+    });
   }
   return (
-    <form className={cn("flex flex-col gap-6", className)} {...props}>
+    <form className={cn("flex flex-col gap-6", className)} {...props} onSubmit={handleSubmit}>
       <div className="flex flex-col items-center gap-2 text-center">
         <h1 className="text-2xl font-bold">Sign Up</h1>
         <p className="text-muted-foreground text-sm text-balance">
@@ -46,7 +45,7 @@ export function SignupForm({
           </div>
           <Input id="password" type="password" required value={formData.password} onChange={(e)=>setFormData({...formData, password: e.target.value })}/>
         </div>
-        <Button type="submit" className="w-full" onClick={handleSubmit}>
+        <Button type="submit" className="w-full">
           Create Account
         </Button>
         <div
