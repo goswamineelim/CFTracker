@@ -11,18 +11,25 @@ export function SignupForm({
   ...props
 }) {
   const navigate = useNavigate();
-  const {signup, loginGoogle, isSigningUp} = useAuthStore();
+  const { signup, loginGoogle, isSigningUp } = useAuthStore();
   async function handleSubmit(formData) {
-    const data ={
-      username: formData.get("username"),
-      email: formData.get("email"),
-      password: formData.get("password")
-    }
-    signup(data);
+  const data = {
+    username: formData.get("username"),
+    email: formData.get("email"),
+    password: formData.get("password"),
+  };
+
+  const result = await signup(data);
+
+  if (result) {
     navigate("/verify-otp", {
-      state: data
+      state: data, 
     });
+  } else {
+    console.error("Invalid Input: Signup failed");
   }
+}
+
   const handleLoginWithGoogle = (e) => {
     e.preventDefault();
     loginGoogle();
@@ -36,7 +43,7 @@ export function SignupForm({
         </p>
       </div>
       <div className="grid gap-6">
-      <div className="grid gap-3">
+        <div className="grid gap-3">
           <Label htmlFor="email">Username</Label>
           <Input id="name" name="username" placeholder="Full Name" required />
         </div>

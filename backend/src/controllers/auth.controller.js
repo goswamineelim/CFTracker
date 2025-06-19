@@ -24,14 +24,15 @@ export const signup = async (req, res) => {
         }, 5 * 60 * 1000);
         otpStore[email] = {otp, timeoutId};
 
-        await sendEmail(
+        sendEmail(
             email,
             "OTP Verification for CFTracker",
             `Your OTP is: ${otp}`
-        );
-
+            ).catch((err) => {
+            console.error("Error sending OTP email:", err);
+        });
         res.status(201).json({
-            message: "OTP sent to email"
+        message: "OTP generation initiated",
         });
     }
     catch (err) {
@@ -98,7 +99,7 @@ export const verify = async (req, res) =>{
             name: user.username,
             email: user.email,
             handle: user.handle,
-            avatar: req.user.avatar,
+            avatar: user.avatar,
         });
     } catch (err) {
         res.status(500).json({
@@ -107,6 +108,50 @@ export const verify = async (req, res) =>{
         });
     }
 }
+
+export const resendOTP = async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).json({ message: "Email is required" });
+  }
+
+  try {
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: "Email already registered" });
+    }
+
+    const existingOTP = otpStore[email];
+    if (existingOTP) {
+      clearTimeout(existingOTP.timeoutId);
+      delete otpStore[email];
+    }
+
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+    const timeoutId = setTimeout(() => {
+      delete otpStore[email];
+    }, 5 * 60 * 1000); 
+
+    otpStore[email] = { otp, timeoutId };
+
+    sendEmail(
+      email,
+        "OTP Verification for CFTracker",
+        `Your OTP is: ${otp}`
+    ).catch((err) => {
+      console.error("Error sending OTP email:", err);
+    });
+
+    return res.status(200).json({ message: "OTP resent successfully" });
+  } catch (err) {
+    return res.status(500).json({
+      message: "Failed to resend OTP",
+      error: err.message,
+    });
+  }
+};
 
 export const getInfo = async (req, res) => {
     console.log(req.user);
