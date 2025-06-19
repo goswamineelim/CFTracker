@@ -4,21 +4,19 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useAuthStore } from "../store/useAuthStore"
 import { Link, useNavigate } from "react-router-dom"
-import { useState } from "react"
 
 export function LoginForm({
   className,
   ...props
 }) {
   const {loginGoogle, login} = useAuthStore();
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  })
   const navigate = useNavigate();
-  const handleLogin = (e) => {
-    e.preventDefault();
-    login(formData);
+  async function handleLogin(formData) {
+    const data ={
+      email: formData.get("email"),
+      password: formData.get("password")
+    }
+    login(data);
     navigate("/");
   }
   const handleLoginWithGoogle = (e) => {
@@ -26,7 +24,7 @@ export function LoginForm({
     loginGoogle();
   }
   return (
-    <form className={cn("flex flex-col gap-6", className)} {...props}>
+    <form className={cn("flex flex-col gap-6", className)} action={handleLogin} {...props}>
       <div className="flex flex-col items-center gap-2 text-center">
         <h1 className="text-2xl font-bold">Login to your account</h1>
         <p className="text-muted-foreground text-sm text-balance">
@@ -36,7 +34,7 @@ export function LoginForm({
       <div className="grid gap-6">
         <div className="grid gap-3">
           <Label htmlFor="email">Email</Label>
-          <Input id="email" type="email" placeholder="m@example.com" required onChange={(e)=>setFormData({...formData, email: e.target.value })}/>
+          <Input id="email" name ="email" type="email" placeholder="m@example.com" required/>
         </div>
         <div className="grid gap-3">
           <div className="flex items-center">
@@ -45,9 +43,9 @@ export function LoginForm({
               Forgot your password?
             </a>
           </div>
-          <Input id="password" type="password" required onChange={(e)=>setFormData({...formData, password: e.target.value })}/>
+          <Input id="password" name="password" type="password" required />
         </div>
-        <Button type="submit" className="w-full" onClick={handleLogin}>
+        <Button type="submit" className="w-full" >
           Login
         </Button>
         <div
