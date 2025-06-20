@@ -256,5 +256,56 @@ export const getAllProblems = async (req, res) => {
   }
 };
 
+//search by tags gets problems with matching tags(all the tags mentioned should be matched)
+export const getByTags = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const { tags } = req.body;
+
+    if (!Array.isArray(tags) || tags.length === 0) {
+      return res.status(400).json({ message: "Please provide at least one tag" });
+    }
+
+    // Fetch all unsolved problems for the user
+    const problems = await Problem.find({ userId, problemState: "U" }).lean();
+
+    // Filter problems where ALL requested tags are present in the problem's tags
+    const filtered = problems.filter(problem =>
+      tags.every(tag => problem.tags.includes(tag))
+    );
+
+    return res.status(200).json({ problems: filtered });
+  } catch (error) {
+    console.error("Error in getByTags:", error.message);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+// search by name in db
+ export const searchProblemByName = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const { name } = req.query;
+
+    if (!name) {
+      return res.status(400).json({ message: "Problem name is required" });
+    }
+
+    // Case-insensitive partial match
+    const problems = await Problem.find({
+      userId,
+      name: { $regex: new RegExp(name, 'i') }
+    });
+
+    if (problems.length === 0) {
+      return res.status(404).json({ message: "No matching problem found for this user" });
+    }
+
+    return res.status(200).json({ problems });
+  } catch (error) {
+    console.error("Search error:", error.message);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
 
 

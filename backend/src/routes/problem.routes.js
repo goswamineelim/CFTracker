@@ -1,5 +1,5 @@
 import express from "express";
-import { addProblem, getProblems, deleteProblemByContestAndIndex} from "../controllers/problem.controller.js";
+import { addProblem, getProblems, deleteProblemByContestAndIndex,getByTags,searchProblemByName} from "../controllers/problem.controller.js";
 import { protectRoute } from "../middleware/isAuth.js";
 import { refreshProblemStates } from "../controllers/problem.controller.js";
 import { getAllProblems } from "../controllers/problem.controller.js";
@@ -15,5 +15,8 @@ router.delete("/contest/:contestID/index/:problemIndex", protectRoute, deletePro
 router.post("/refresh", protectRoute, refreshProblemStates);
 // returns all the problems
 router.get("/all", protectRoute, getAllProblems);
-
+//returns  usolved problems with matching tags
+router.post("/by-tags", protectRoute, getByTags);
+//returns problem with same name in DB
+router.get('/search/user', protectRoute, searchProblemByName);
 export default router;
