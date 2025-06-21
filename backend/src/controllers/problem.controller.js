@@ -144,7 +144,7 @@ export const getProblems = async (req, res) => {
       );
     }
 
-    return res.status(200).json({ problems: unsolvedProblems });
+    return res.status(200).json({ unsolvedProblems });
 
   } catch (error) {
     console.error("Error in getProblems:", error.message);
