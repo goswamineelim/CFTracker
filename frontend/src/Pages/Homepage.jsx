@@ -26,10 +26,6 @@ export default function Page() {
     getUser();
     getProblems();
   }, []);
-  
-  useEffect(() => {
-    console.log("Auth user changed:", authUser);
-  }, [authUser]);
   return (
     <SidebarProvider>
       <AppSidebar />

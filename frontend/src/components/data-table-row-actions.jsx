@@ -1,5 +1,6 @@
 import { MoreHorizontal } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Pencil, Trash } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,13 +28,14 @@ export function DataTableRowActions({ row }) {
           <span className="sr-only">Open row menu</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-[160px]">
+      <DropdownMenuContent align="end" className="">
         <DropdownMenuItem onClick={() => console.log("Edit", data)}>
+          <Pencil className="mr-2 h-4 w-4" />
           Edit
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => console.log("Delete", data)}>
+          <Trash className="mr-2 h-4 w-4 text-red-500" />
           Delete
         </DropdownMenuItem>
       </DropdownMenuContent>

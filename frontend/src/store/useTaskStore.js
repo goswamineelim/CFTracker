@@ -8,11 +8,14 @@ export const useTaskStore = create((set, get) => ({
     isFetching: false,
     isDeleting: false,
     isRefreshing: false,
-    getProblems : () => {
+    getProblems : async () => {
         set({isFetching:true});
         try {
-            const res = axiosInstance.get(`${API_URL}/problems/`);
-            console.log(res);
+            const res = await axiosInstance.get(`${API_URL}/problems/`);
+            console.log(res.data.problems);
+            const rows = Array.isArray(res.data.problems) ? res.data.problems : Object.values(res.data.problems);
+            set({problems: rows})
+            console.log(rows);
         } catch(error){
             // handle error
         } finally {

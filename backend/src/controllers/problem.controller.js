@@ -63,7 +63,6 @@ if (!match) {
     await newProblem.save();
 
     return res.status(200).json({
-      message: "Problem added successfully",
       problem: {
         _id: newProblem._id,
         contestID,

@@ -1,10 +1,10 @@
-import { X } from "lucide-react"
+import { useEffect, useState } from "react"
+import { X, Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { DataTableFacetedFilter } from "./data-table-faceted-filter"
 import { DataTableViewOptions } from "@/components/data-table-view-options"
 import { useTaskStore } from "../store/useTaskStore"
-import { Plus } from "lucide-react"
 import {
     Dialog,
     DialogTrigger,
@@ -14,47 +14,56 @@ import {
     DialogDescription,
     DialogFooter,
 } from "@/components/ui/dialog"
-import { useState } from "react"
 
 export function DataTableToolbar({ table }) {
     const [open, setOpen] = useState(false)
     const [link, setLink] = useState("")
+    const [allTags, setAllTags] = useState([])
 
-    const { problems, addProblem } = useTaskStore()
+    const problems = useTaskStore((state) => state.problems)
+    const addProblem = useTaskStore((state) => state.addProblem)
 
     const isFiltered = table.getState().columnFilters.length > 0
 
     const handleSubmit = () => {
-        if (!link.trim()) return;
+        if (!link.trim()) return
         addProblem(link)
         setLink("")
         setOpen(false)
     }
 
-    const allTags = Array.from(
-        new Set(
-            Array.isArray(problems.data)
-                ? problems.data.flatMap((p) => p.tags ?? [])
-                : []
-        )
-    )
+    useEffect(() => {
+        if (!problems || !Array.isArray(problems)) return
+
+        const tagsSet = new Set()
+        for (const problem of problems) {
+            if (Array.isArray(problem.tags)) {
+                for (const tag of problem.tags) {
+                    tagsSet.add(tag)
+                }
+            }
+        }
+
+        setAllTags(Array.from(tagsSet))
+        console.log("Tags : " + allTags)
+    }, [problems])
 
     return (
         <div className="flex items-center justify-between">
             <div className="flex flex-1 items-center space-x-2">
                 <Input
                     placeholder="Filter by name..."
-                    value={table.getColumn("Name")?.getFilterValue() ?? ""}
+                    value={table.getColumn("name")?.getFilterValue() ?? ""}
                     onChange={(event) =>
-                        table.getColumn("Name")?.setFilterValue(event.target.value)
+                        table.getColumn("name")?.setFilterValue(event.target.value)
                     }
                     className="h-8 w-[150px] lg:w-[250px]"
                 />
 
-                {table.getColumn("status") && (
+                {table.getColumn("problemState") && (
                     <DataTableFacetedFilter
-                        column={table.getColumn("status")}
-                        title="Status"
+                        column={table.getColumn("problemState")}
+                        title="State"
                         options={[
                             { label: "Solved", value: "solved" },
                             { label: "Unsolved", value: "unsolved" },
@@ -62,14 +71,18 @@ export function DataTableToolbar({ table }) {
                     />
                 )}
 
-                {table.getColumn("tags") && allTags.length > 0 && (
+                {table.getColumn("tags") && (
                     <DataTableFacetedFilter
                         column={table.getColumn("tags")}
                         title="Tags"
-                        options={allTags.map((tag) => ({
-                            label: tag,
-                            value: tag,
-                        }))}
+                        options={
+                            allTags.length > 0
+                                ? allTags.map((tag) => ({
+                                    label: tag,
+                                    value: tag,
+                                }))
+                                : []
+                        }
                     />
                 )}
 

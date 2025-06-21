@@ -1,8 +1,8 @@
-// need working
+// columns.jsx or columns.tsx
+
 import { Badge } from "@/components/ui/badge"
 import { DataTableColumnHeader } from "./data-table-column-header"
 import { DataTableRowActions } from "./data-table-row-actions"
-
 
 export const columns = [
   {
@@ -10,53 +10,47 @@ export const columns = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="ID" />
     ),
-    cell: ({ row }) => <div className="w-[80px]">{row.getValue("contestID") + "" + row.getValue("problemIndex")}</div>,
+    cell: ({ row }) => (
+      <div className="w-[80px]">
+        {row.original.contestID + row.original.problemIndex}
+      </div>
+    ),
     enableSorting: true,
     enableHiding: true,
   },
   {
-    accessorKey: "Name",
+    accessorKey: "name",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Name" />
     ),
-    cell: ({ row }) => {
-      return (
-        <div className="flex space-x-2">
-          {/* add ratings here */}
-          {/* {label && <Badge variant="outline">{label.label}</Badge>} */}
-          <span className="max-w-[500px] truncate font-medium">
-            {row.getValue("name")}
-          </span>
-        </div>
-      )
-    },
+    cell: ({ row }) => (
+      <div className="flex space-x-2">
+        <span className="max-w-[500px] truncate font-medium">
+          {row.getValue("name")}
+        </span>
+      </div>
+    ),
   },
   {
-    accessorKey: "status",
+    accessorKey: "problemState",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Status" />
     ),
     cell: ({ row }) => {
-      const status = statuses.find(
-        (status) => status.value === row.getValue("problemState")
-      )
-
-      if (!status) {
-        return null
-      }
-
-      const Icon = status.icon
+      const state = row.getValue("problemState")
+      const isSolved = state === "solved"
 
       return (
-        <div className="flex w-[100px] items-center">
-          {Icon && <Icon className="mr-2 h-4 w-4 text-muted-foreground" />}
-          <span>{status.label}</span>
-        </div>
+        <Badge variant={isSolved ? "default" : "outline"}>
+          {isSolved ? "Solved" : "Unsolved"}
+        </Badge>
       )
     },
     filterFn: (row, id, value) => {
       return value.includes(row.getValue(id))
     },
+    enableColumnFilter: true,
+    enableSorting: true,
   },
   {
     accessorKey: "tags",
@@ -64,8 +58,7 @@ export const columns = [
       <DataTableColumnHeader column={column} title="Tags" />
     ),
     cell: ({ row }) => {
-      const tags = row.getValue("tags")
-
+      const tags = row.getValue("tags") ?? []
       return (
         <div className="flex flex-wrap gap-1 max-w-[300px]">
           {tags.map((tag, index) => (
@@ -80,7 +73,7 @@ export const columns = [
       const tags = row.getValue(id) ?? []
       return filterValue.some((value) => tags.includes(value))
     },
-    enableColumnFilter : true,
+    enableColumnFilter: true,
     enableSorting: false,
     enableHiding: true,
   },
