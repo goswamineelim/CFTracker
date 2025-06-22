@@ -7,6 +7,10 @@ const problemSchema = new mongoose.Schema(
             ref: "User",
             required: true,
         },
+        name:{
+           type: String, 
+           required: true,
+        },      
         contestID: {
             type: Number,
             required: true,
@@ -22,6 +26,10 @@ const problemSchema = new mongoose.Schema(
         problemState: {
             type: String,
             required: true,
+        },
+        tags: {
+            type: [String],
+            default: [],
         },
     },
     {timestamps: true}

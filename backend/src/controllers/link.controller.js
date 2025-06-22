@@ -48,6 +48,7 @@ export const validate =  async (req, res) => {
         return res.status(500).json({"message" : "Internal Server Issue"});
     }
 }
+
 //get the handle from the body and then set a timeout for 5 mins before the object gets deleted and user needs to start again
 export const link = async (req, res) => {
     const {handle} = req.body;
@@ -73,7 +74,6 @@ export const link = async (req, res) => {
         return res.status(500).json({"message" : "error in signup"});
     }
 }
-
 export const disconnect = async (req, res) => {
     const userId = req.user._id;
     try {
@@ -91,4 +91,28 @@ export const disconnect = async (req, res) => {
         console.error("Error disconnecting handle:", error);
         return res.status(500).json({ message: "Internal Server Error" });
     }
+};
+ 
+export const checkHandleExists = async (req, res) => {
+  const { handle } = req.body;
+
+  if (!handle) {
+    return res.status(400).json({ message: "Handle is required" });
+  }
+
+  const url = `https://codeforces.com/api/user.info?handles=${handle}`;
+
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
+
+    if (data.status === "OK" && Array.isArray(data.result) && data.result.length > 0) {
+      return res.status(200).json({ exists: true, handle });
+    } else {
+      return res.status(404).json({ exists: false, message: "Handle does not exist" });
+    }
+  } catch (error) {
+    console.error("Error checking handle:", error.message);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
 };

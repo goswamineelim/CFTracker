@@ -15,17 +15,17 @@ import {
 } from "@/components/ui/sidebar"
 import { useEffect } from "react"
 import { useAuthStore } from "@/store/useAuthStore"
+import {useTaskStore} from "@/store/useTaskStore"
+import Problems from "../components/problems"
+
 
 export default function Page() {
   const {getUser, authUser} = useAuthStore();
+  const {getProblems} = useTaskStore();
   useEffect(() => {
     getUser();
-    console.log(authUser);
+    getProblems();
   }, []);
-  
-  useEffect(() => {
-    console.log("Auth user changed:", authUser);
-  }, [authUser]);
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -64,14 +64,9 @@ export default function Page() {
           </div>
         </header>
 
-        {/* <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-          <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-            <div className="bg-muted/50 aspect-video rounded-xl" />
-            <div className="bg-muted/50 aspect-video rounded-xl" />
-            <div className="bg-muted/50 aspect-video rounded-xl" />
-          </div>
-          <div className="bg-muted/50 min-h-[100vh] flex-1 rounded-xl md:min-h-min" />
-        </div> */}
+        <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
+          <Problems />
+        </div>
 
       </SidebarInset>
     </SidebarProvider>

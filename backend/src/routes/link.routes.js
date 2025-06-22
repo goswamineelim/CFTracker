@@ -1,6 +1,6 @@
 // linking the codeforces account
 import express from "express";
-import {link, validate,disconnect} from "../controllers/link.controller.js"
+import {link, validate,disconnect,checkHandleExists} from "../controllers/link.controller.js"
 import { protectRoute } from "../middleware/isAuth.js";
 
 const router = express.Router();
@@ -9,5 +9,6 @@ const router = express.Router();
 router.post("/link", protectRoute,  link);
 router.post("/validate", protectRoute, validate);
 router.post("/disconnect", protectRoute, disconnect);
+router.post("/validateIfExists",protectRoute,checkHandleExists);
 
 export default router;
