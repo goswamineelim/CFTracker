@@ -9,14 +9,15 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-
-export default function ConnectHandlePopup({ open, onClose, onConfirm }) {
+import { useHandleStore } from "../../store/useHandleStore"
+export default function ConnectHandlePopup({ open, onClose}) {
   const [handle, setHandle] = useState("");
-
+  const {linkHandle} = useHandleStore();
   const handleSubmit = (e) => {
     e.preventDefault();
     if (handle.trim() !== "") {
-      onConfirm(handle.trim());
+      // onConfirm(handle.trim());
+      linkHandle(handle.trim());
     }
   };
 
@@ -49,12 +50,12 @@ export default function ConnectHandlePopup({ open, onClose, onConfirm }) {
             </a>
           </div>
 
-          <DialogFooter className="pt-2">
+          <div variant="outline"  className="flex justify-end gap-4 pt-2">
             <Button type="button" variant="outline" onClick={() => onClose(false)}>
               Cancel
             </Button>
-            <Button type="submit">Next</Button>
-          </DialogFooter>
+            <Button className="w-24" type="submit">Next</Button>
+          </div>
         </form>
       </DialogContent>
     </Dialog>

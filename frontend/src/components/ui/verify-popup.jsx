@@ -9,6 +9,8 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Copy } from "lucide-react";
+import { useHandleStore } from "@/store/useHandleStore";
+import { useAuthStore } from "@/store/useAuthStore";
 export default function VerifyHandlePopup({
   open,
   onClose,
@@ -16,38 +18,31 @@ export default function VerifyHandlePopup({
   problemUrl,
   problemName,
   providedCode,
-  expiryTime,
-  onExpired, // <- 🔔 Notify AppSidebar on expiry
 }) {
+  const { timeRemaining, clearVerification, validateHandle } = useHandleStore();
   const [copied, setCopied] = useState(false);
   const timerRef = useRef(null);
   const animationFrameRef = useRef();
 
   useEffect(() => {
     if (!open) return;
-
     const update = () => {
-      const remaining = expiryTime - Date.now();
-      const clampedSeconds = Math.max(0, Math.floor(remaining / 1000));
-      const mins = String(Math.floor(clampedSeconds / 60)).padStart(2, "0");
-      const secs = String(clampedSeconds % 60).padStart(2, "0");
-
+      const remaining = timeRemaining();
+      if (remaining <= 0) {
+        clearVerification();
+        onClose(false);
+        return;
+      }
+      const mins = String(Math.floor(remaining / 60)).padStart(2, "0");
+      const secs = String(remaining % 60).padStart(2, "0");
       if (timerRef.current) {
         timerRef.current.textContent = `${mins}:${secs}`;
       }
-
-      // Notify parent if expired
-      if (clampedSeconds === 0) {
-        onExpired?.();
-        return; // Stop animation after expiry
-      }
-
       animationFrameRef.current = requestAnimationFrame(update);
     };
-
     animationFrameRef.current = requestAnimationFrame(update);
     return () => cancelAnimationFrame(animationFrameRef.current);
-  }, [open, expiryTime, onExpired]);
+  }, [open, timeRemaining, clearVerification, onClose]);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(providedCode);
@@ -55,16 +50,26 @@ export default function VerifyHandlePopup({
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const handleVerifyNow = () => {
-    onClose(false);
+  const {getUser} = useAuthStore();
+
+  const handleVerifyNow = async () => {
+    const success = await validateHandle();
+    if (success)
+        {
+            onClose(false);
+            await getUser();
+        } 
   };
 
   return (
+    
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Verify your Codeforces Handle</DialogTitle>
-          <DialogDescription>Submit a compilation error to complete verification.</DialogDescription>
+          <DialogDescription>
+            Submit a compilation error to complete verification.
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-2 text-sm leading-relaxed">
@@ -75,7 +80,9 @@ export default function VerifyHandlePopup({
 
           <div className="flex flex-col items-center gap-1 text-muted-foreground">
             <span className="text-sm">Time remaining to submit:</span>
-            <span ref={timerRef} className="text-lg font-semibold text-foreground">--:--</span>
+            <span ref={timerRef} className="text-lg font-semibold text-foreground">
+              --:--
+            </span>
           </div>
 
           <div className="space-y-2">
@@ -93,7 +100,8 @@ export default function VerifyHandlePopup({
               >
                 {problemName}
               </a>{" "}
-              and submit the provided code using your handle <span className="font-semibold">{handle}</span>.
+              and submit the provided code using your handle{" "}
+              <span className="font-semibold">{handle}</span>.
             </div>
             <pre className="relative bg-muted p-3 rounded-md text-sm overflow-auto border">
               <code>{providedCode}</code>

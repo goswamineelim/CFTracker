@@ -30,7 +30,7 @@ app.use(cookieParser());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/problems", problemRoutes);
-app.use("/api/link", linkRoute)
+app.use("/api/link-handle", linkRoute)
 
 
 const PORT = process.env.PORT;
