@@ -55,7 +55,7 @@ if (!match) {
       contestID,
       problemIndex,
       problemLink,
-      problemState: "U", // Unsolved
+      problemState: "unsolved", // Unsolved
       name,
       tags,
     });
@@ -70,7 +70,7 @@ if (!match) {
         name,
         tags,
         problemLink,
-        problemState: "U",
+        problemState: "unsolved",
       },
     });
   } catch (error) {
@@ -115,13 +115,13 @@ export const getProblems = async (req, res) => {
       const key = p.contestID + p.problemIndex;
 
       if (solvedSet.has(key)) {
-        if (p.problemState !== "S") {
+        if (p.problemState !== "solved") {
           // Mark as solved in DB if not already
           updated.push(p._id);
         }
       } else {
         // Only return unsolved ones to frontend
-        if (p.problemState === "U") {
+        if (p.problemState === "unsolved") {
           unsolvedProblems.push({
             _id: p._id,
             contestID: p.contestID,
@@ -139,7 +139,7 @@ export const getProblems = async (req, res) => {
     if (updated.length > 0) {
       await Problem.updateMany(
         { _id: { $in: updated } },
-        { $set: { problemState: "S" } }
+        { $set: { problemState: "solved" } }
       );
     }
 
@@ -199,7 +199,7 @@ export const refreshProblemStates = async (req, res) => {
       return res.status(400).json({ message: "Codeforces handle not linked" });
     }
 
-    const url = `https://codeforces.com/api/user.status?handle=${handle}&from=1&count=1000`;
+    const url = `https://codeforces.com/api/user.status?handle=${handle}`;
     const resp = await fetch(url);
     const data = await resp.json();
 
@@ -220,7 +220,7 @@ export const refreshProblemStates = async (req, res) => {
 
     for (const p of userProblems) {
       const key = `${p.contestID}${p.problemIndex}`;
-      if (solvedSet.has(key) && p.problemState !== "S") {
+      if (solvedSet.has(key) && p.problemState !== "solved") {
         toUpdate.push(p._id);
       }
     }
@@ -228,7 +228,7 @@ export const refreshProblemStates = async (req, res) => {
     if (toUpdate.length > 0) {
       await Problem.updateMany(
         { _id: { $in: toUpdate } },
-        { $set: { problemState: "S" } }
+        { $set: { problemState: "solved" } }
       );
     }
 

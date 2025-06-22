@@ -8,7 +8,7 @@ const router = express.Router();
 // Add a new problem by link
 router.post("/add", protectRoute, addProblem);
 //  Get all unsolved problems for the user
-router.get("/uns", protectRoute, getProblems);
+router.get("/ref", protectRoute, refreshProblemStates);
 // Delete a problem by problem index and contest id
 router.delete("/contest/:contestID/index/:problemIndex", protectRoute, deleteProblemByContestAndIndex);
 //Updates unsolved to solved

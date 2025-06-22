@@ -1,6 +1,6 @@
 import { MoreHorizontal } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Pencil, Trash } from "lucide-react"
+import { Pencil, Trash, ExternalLink } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,7 +16,6 @@ import {
 
 export function DataTableRowActions({ row }) {
   const data = row.original
-
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -29,6 +28,15 @@ export function DataTableRowActions({ row }) {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="">
+        <a
+          href={data.problemLink}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-2 px-2 py-1.5 text-sm cursor-pointer hover:bg-muted"
+        >
+          <ExternalLink className="h-4 w-4 text-gray-500 transition group-hover:translate-x-1 group-hover:text-blue-600" />
+          Solve
+        </a>
         <DropdownMenuItem onClick={() => console.log("Edit", data)}>
           <Pencil className="mr-2 h-4 w-4" />
           Edit

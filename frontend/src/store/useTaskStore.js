@@ -11,6 +11,7 @@ export const useTaskStore = create((set, get) => ({
     getProblems : async () => {
         set({isFetching:true});
         try {
+            await axiosInstance.get(`${API_URL}/problems/ref`);
             const res = await axiosInstance.get(`${API_URL}/problems/`);
             console.log(res.data.problems);
             const rows = Array.isArray(res.data.problems) ? res.data.problems : Object.values(res.data.problems);
@@ -25,7 +26,7 @@ export const useTaskStore = create((set, get) => ({
     addProblem : (link) => {
         set({isAdding: true});
         try{
-            const res = axiosInstance.post(`${API_URL}/problems/add`, link);
+            const res = axiosInstance.post(`${API_URL}/problems/add`, {problemLink: link});
             if(res.status == 400){
                 console.log("Invalid Problem");
             }
