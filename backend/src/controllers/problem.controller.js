@@ -6,28 +6,23 @@ export const addProblem = async (req, res) => {
   try {
     const userId = req.user._id;
     const user = await User.findById(userId);
-
-    if (!user.handle) {
-      return res.status(403).json({ message: "Please link your Codeforces handle before adding problems" });
-    }
-
+    
     const { problemLink } = req.body;
-if (
-  !problemLink ||
-  (
-    !problemLink.includes("codeforces.com/contest/") &&
-    !problemLink.includes("codeforces.com/problemset/problem/") &&
-    !problemLink.includes("codeforces.com/gym/")
-  )
-)   {
-      return res.status(400).json({ message: "Invalid Codeforces problem link" });
+    let match;
+
+    if (problemLink.includes("contest") || problemLink.includes("gym")) {
+      // contest/123/problem/A or gym/123/problem/B
+      match = problemLink.match(/\/(?:contest|gym)\/(\d+)\/problem\/([A-Za-z0-9]+)/);
+    } else if (problemLink.includes("problemset/problem")) {
+      // problemset/problem/2121/H
+      match = problemLink.match(/\/problemset\/problem\/(\d+)\/([A-Za-z0-9]+)/);
     }
 
-    // Extract contestId and problemIndex from the link
-const match = problemLink.match(/(?:contest|problemset|gym)\/(\d+)\/problem\/([A-Z0-9]+)/i);
-if (!match) {
-  return res.status(400).json({ message: "Unable to extract contest ID and problem index" });
-}
+
+
+    if (!match) {
+      return res.status(400).json({ message: "Unable to extract contest ID and problem index" });
+    }
 
     const contestID = parseInt(match[1]);
     const problemIndex = match[2].toUpperCase();
@@ -158,7 +153,7 @@ export const deleteProblemByContestAndIndex = async (req, res) => {
   try {
     const userId = req.user._id;
     const user = await User.findById(userId);
-    
+
     if (!user.handle) {
       return res.status(403).json({ message: "Please link your Codeforces handle before deleting problems" });
     }
@@ -248,7 +243,7 @@ export const getAllProblems = async (req, res) => {
 
     const problems = await Problem.find({ userId }).lean(); // `lean()` includes all fields by default
 
-    return res.status(200).json({ problems }); 
+    return res.status(200).json({ problems });
   } catch (error) {
     console.error("Error in getAllProblems:", error.message);
     return res.status(500).json({ message: "Internal Server Error" });
@@ -280,7 +275,7 @@ export const getByTags = async (req, res) => {
   }
 };
 // search by name in db
- export const searchProblemByName = async (req, res) => {
+export const searchProblemByName = async (req, res) => {
   try {
     const userId = req.user._id;
     const { name } = req.query;

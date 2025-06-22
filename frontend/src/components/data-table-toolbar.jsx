@@ -14,6 +14,7 @@ import {
     DialogDescription,
     DialogFooter,
 } from "@/components/ui/dialog"
+import { RotateCcw } from "lucide-react"
 
 export function DataTableToolbar({ table }) {
     const [open, setOpen] = useState(false)
@@ -22,6 +23,8 @@ export function DataTableToolbar({ table }) {
 
     const problems = useTaskStore((state) => state.problems)
     const addProblem = useTaskStore((state) => state.addProblem)
+    const refresh = useTaskStore((state) => state.refresh)
+    const isRefreshing = useTaskStore((state) => state.isRefreshing)
 
     const isFiltered = table.getState().columnFilters.length > 0
 
@@ -31,7 +34,9 @@ export function DataTableToolbar({ table }) {
         setLink("")
         setOpen(false)
     }
-
+    useEffect(() => {
+        refresh();
+    }, [])
     useEffect(() => {
         if (!problems || !Array.isArray(problems)) return
 
@@ -111,6 +116,9 @@ export function DataTableToolbar({ table }) {
                         <span className="sr-only">Add Problem</span>
                     </Button>
                 </DialogTrigger>
+                <Button onClick={refresh} size = "icon" variant="outline" className="h-8 w-8 gap-2">
+                    <RotateCcw className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`} />
+                </Button>
 
                 <DialogContent>
                     <DialogHeader>
@@ -124,7 +132,7 @@ export function DataTableToolbar({ table }) {
                         value={link}
                         onChange={(e) => setLink(e.target.value)}
                     />
-                    <DialogFooter>
+                    <DialogFooter className="flex justify-between">
                         <Button onClick={handleSubmit}>Add</Button>
                     </DialogFooter>
                 </DialogContent>
