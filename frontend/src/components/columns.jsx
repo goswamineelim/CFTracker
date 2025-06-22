@@ -1,5 +1,3 @@
-// columns.jsx or columns.tsx
-
 import { Badge } from "@/components/ui/badge"
 import { DataTableColumnHeader } from "./data-table-column-header"
 import { DataTableRowActions } from "./data-table-row-actions"
@@ -10,12 +8,15 @@ export const columns = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="ID" />
     ),
-    cell: ({ row }) => (
-      <div className="w-[80px]">
-        {row.original.contestID + row.original.problemIndex}
-      </div>
-    ),
-    enableSorting: true,
+    cell: ({ row }) => {
+      const { contestID, problemIndex } = row.original || {}
+      return (
+        <div className="w-[80px]">
+          {contestID}{problemIndex}
+        </div>
+      )
+    },
+    enableSorting: false,
     enableHiding: true,
   },
   {

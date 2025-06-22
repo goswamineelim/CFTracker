@@ -6,7 +6,7 @@ export const addProblem = async (req, res) => {
   try {
     const userId = req.user._id;
     const user = await User.findById(userId);
-    
+
     const { problemLink } = req.body;
     let match;
 
@@ -74,78 +74,28 @@ export const addProblem = async (req, res) => {
   }
 };
 
-//gets unsolved problems and also marks the solved problems  as "S" in DB
-
-export const getProblems = async (req, res) => {
+export const markSolve = async (req, res) => {
   try {
+    const { problemIndex, contestID } = req.body;
+    if(!problemIndex || !contestID) {
+      return res.status(403).json({ message: "Problem Index or contest id missing" });
+    }
     const userId = req.user._id;
-    const user = await User.findById(userId);
-    const handle = user.handle;
-
-    // Fetch latest submissions from Codeforces + all user problems (U and S)
-    const [resp, allProblems] = await Promise.all([
-      fetch(`https://codeforces.com/api/user.status?handle=${handle}`),
-      Problem.find({ userId }).lean(),
-    ]);
-
-    const data = await resp.json();
-
-    if (data.status !== "OK") {
-      return res.status(500).json({ message: "Codeforces API error" });
-    }
-
-    // Create a set of solved problem IDs from Codeforces
-    const solvedSet = new Set();
-    for (const submission of data.result) {
-      if (submission.verdict === "OK") {
-        const key = submission.problem.contestId + submission.problem.index;
-        solvedSet.add(key);
+    await Problem.updateOne({
+      userId: userId,
+      contestID: contestID,
+      problemIndex: problemIndex
+    },
+    {
+      $set: {
+        problemState : "solved"
       }
-    }
-
-    const updated = [];
-    const unsolvedProblems = [];
-
-    for (const p of allProblems) {
-      const key = p.contestID + p.problemIndex;
-
-      if (solvedSet.has(key)) {
-        if (p.problemState !== "solved") {
-          // Mark as solved in DB if not already
-          updated.push(p._id);
-        }
-      } else {
-        // Only return unsolved ones to frontend
-        if (p.problemState === "unsolved") {
-          unsolvedProblems.push({
-            _id: p._id,
-            contestID: p.contestID,
-            problemIndex: p.problemIndex,
-            name: p.name,
-            tags: p.tags,
-            problemLink: p.problemLink,
-            problemState: p.problemState,
-          });
-        }
-      }
-    }
-
-    // Batch update solved problems
-    if (updated.length > 0) {
-      await Problem.updateMany(
-        { _id: { $in: updated } },
-        { $set: { problemState: "solved" } }
-      );
-    }
-
-    return res.status(200).json({ unsolvedProblems });
-
+    });
+    return res.status(200).json({message : "success"});
   } catch (error) {
-    console.error("Error in getProblems:", error.message);
     return res.status(500).json({ message: "Internal Server Error" });
   }
-};
-
+}
 
 //deletes problems by problem index and contest id of the problem
 
@@ -154,11 +104,7 @@ export const deleteProblemByContestAndIndex = async (req, res) => {
     const userId = req.user._id;
     const user = await User.findById(userId);
 
-    if (!user.handle) {
-      return res.status(403).json({ message: "Please link your Codeforces handle before deleting problems" });
-    }
-
-    const { contestID, problemIndex } = req.params;
+    const { contestID, problemIndex } = req.body;
 
     if (!contestID || !problemIndex) {
       return res.status(400).json({ message: "contestID and problemIndex are required" });
@@ -189,13 +135,10 @@ export const refreshProblemStates = async (req, res) => {
     const userId = req.user._id;
     const user = await User.findById(userId);
     const handle = user.handle;
-
-    if (!handle) {
-      return res.status(400).json({ message: "Codeforces handle not linked" });
-    }
-
-    const url = `https://codeforces.com/api/user.status?handle=${handle}`;
-    const resp = await fetch(url);
+    const [resp, allProblems] = await Promise.all([
+      fetch(`https://codeforces.com/api/user.status?handle=${handle}`),
+      Problem.find({ userId }).lean(),
+    ]);
     const data = await resp.json();
 
     if (data.status !== "OK") {
@@ -209,15 +152,29 @@ export const refreshProblemStates = async (req, res) => {
         solvedSet.add(key);
       }
     }
-
-    const userProblems = await Problem.find({ userId });
+   
     const toUpdate = [];
+    const unsolvedProblems = [];
 
-    for (const p of userProblems) {
-      const key = `${p.contestID}${p.problemIndex}`;
-      if (solvedSet.has(key) && p.problemState !== "solved") {
-        toUpdate.push(p._id);
+    for (const p of allProblems) {
+      const key = p.contestID + p.problemIndex;
+      let state = p.problemState;
+      if (solvedSet.has(key)) {
+        if (p.problemState !== "solved") {
+          // Mark as solved in DB if not already
+          state = "solved";
+          toUpdate.push(p._id);
+        }
       }
+      unsolvedProblems.push({
+        _id: p._id,
+        contestID: p.contestID,
+        problemIndex: p.problemIndex,
+        name: p.name,
+        tags: p.tags,
+        problemLink: p.problemLink,
+        problemState: state,
+      })
     }
 
     if (toUpdate.length > 0) {
@@ -227,7 +184,7 @@ export const refreshProblemStates = async (req, res) => {
       );
     }
 
-    return res.status(200).json({ message: "Problem statuses refreshed successfully" });
+    return res.status(200).json({unsolvedProblems});
   } catch (error) {
     console.error("Refresh error:", error.message);
     return res.status(500).json({ message: "Internal Server Error" });
@@ -246,57 +203,6 @@ export const getAllProblems = async (req, res) => {
     return res.status(200).json({ problems });
   } catch (error) {
     console.error("Error in getAllProblems:", error.message);
-    return res.status(500).json({ message: "Internal Server Error" });
-  }
-};
-
-//search by tags gets problems with matching tags(all the tags mentioned should be matched)
-export const getByTags = async (req, res) => {
-  try {
-    const userId = req.user._id;
-    const { tags } = req.body;
-
-    if (!Array.isArray(tags) || tags.length === 0) {
-      return res.status(400).json({ message: "Please provide at least one tag" });
-    }
-
-    // Fetch all unsolved problems for the user
-    const problems = await Problem.find({ userId, problemState: "U" }).lean();
-
-    // Filter problems where ALL requested tags are present in the problem's tags
-    const filtered = problems.filter(problem =>
-      tags.every(tag => problem.tags.includes(tag))
-    );
-
-    return res.status(200).json({ problems: filtered });
-  } catch (error) {
-    console.error("Error in getByTags:", error.message);
-    return res.status(500).json({ message: "Internal Server Error" });
-  }
-};
-// search by name in db
-export const searchProblemByName = async (req, res) => {
-  try {
-    const userId = req.user._id;
-    const { name } = req.query;
-
-    if (!name) {
-      return res.status(400).json({ message: "Problem name is required" });
-    }
-
-    // Case-insensitive partial match
-    const problems = await Problem.find({
-      userId,
-      name: { $regex: new RegExp(name, 'i') }
-    });
-
-    if (problems.length === 0) {
-      return res.status(404).json({ message: "No matching problem found for this user" });
-    }
-
-    return res.status(200).json({ problems });
-  } catch (error) {
-    console.error("Search error:", error.message);
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };

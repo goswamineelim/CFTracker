@@ -5,7 +5,8 @@ import { useTaskStore } from "../store/useTaskStore"
 import {Button} from "@/components/ui/button"
 
 export default function Problems() {
-    const { problems, getProblems } = useTaskStore();
+    const problems = useTaskStore(state => state.problems); // ✅ proper subscription
+    const getProblems = useTaskStore(state => state.getProblems);
     useEffect(() => {
         getProblems();
     }, [])
@@ -13,7 +14,7 @@ export default function Problems() {
         <>
             <div className="p-4">
                 <h1 className="text-xl font-bold mb-4">Your Problem List</h1>
-                <DataTable columns={columns} data={problems} />
+                <DataTable columns={columns} data={Object.values(problems)} />
             </div>
         </>
     )

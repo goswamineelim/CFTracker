@@ -70,7 +70,6 @@ export const login = async (req, res) => {
 export const verify = async (req, res) =>{
     const {username, email, password, otp } = req.body;
     const stored = otpStore[email];
-    console.log(stored);
     if (!stored) {
         return res.status(400).json({
             message: "No OTP found. Please sign up again."
@@ -154,12 +153,10 @@ export const resendOTP = async (req, res) => {
 };
 
 export const getInfo = async (req, res) => {
-    console.log(req.user);
     try{
         if (!req.user) {
             return res.status(404).json({ message: "User not found" });
         }
-        // console.log(req.user);
         return res.status(200).json({
             name : req.user.username, 
             handle: req.user.handle,

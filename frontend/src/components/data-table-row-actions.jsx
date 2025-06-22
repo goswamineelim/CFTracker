@@ -13,9 +13,13 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { Check } from "lucide-react"
+import { useTaskStore } from "../store/useTaskStore"
 
 export function DataTableRowActions({ row }) {
   const data = row.original
+  const markProblemAsSolved = useTaskStore(state => state.markProblemAsSolved);
+  const deleteProblems = useTaskStore(state => state.deleteProblems);
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -37,12 +41,20 @@ export function DataTableRowActions({ row }) {
           <ExternalLink className="h-4 w-4 text-gray-500 transition group-hover:translate-x-1 group-hover:text-blue-600" />
           Solve
         </a>
+        <DropdownMenuItem onClick={() => markProblemAsSolved(row.original)}>
+          <Check
+            className={`text-emerald-500`}
+            size={32}
+            strokeWidth={2.5}
+          />
+          Mark As Solved
+        </DropdownMenuItem>
         <DropdownMenuItem onClick={() => console.log("Edit", data)}>
           <Pencil className="mr-2 h-4 w-4" />
           Edit
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => console.log("Delete", data)}>
+        <DropdownMenuItem onClick={() =>  deleteProblems(row.original)}>
           <Trash className="mr-2 h-4 w-4 text-red-500" />
           Delete
         </DropdownMenuItem>

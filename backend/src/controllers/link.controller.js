@@ -15,7 +15,6 @@ export const validate =  async (req, res) => {
     try{
         const tracked = signupTracker[handle];
         if (!tracked) {
-            console.log(signupTracker);
             return res.status(400).json({ "message" : "No signup started for this handle or signup expired" });
         }
         const { startTime } = tracked;
@@ -28,7 +27,6 @@ export const validate =  async (req, res) => {
             const prob = subProb.problem;
             if(prob.contestId === contestId && prob.index === problemIndex && subProb.verdict === "COMPILATION_ERROR"){
                 if(startTime <= subProb.creationTimeSeconds){
-                    console.log(handle);
                     await User.findByIdAndUpdate(
                         userId, 
                         { handle: handle },
