@@ -1,6 +1,7 @@
 // store/useHandleStore.js
 import { create } from "zustand";
 import { axiosInstance } from "@/lib/axios";
+import { useAuthStore } from "./useAuthStore";
 
 const API_URL = "http://localhost:5000/api/link-handle";
 export const useHandleStore = create((set, get) => ({
@@ -101,5 +102,14 @@ export const useHandleStore = create((set, get) => ({
       verificationStarted: false,
       error: null,
     });
+  },
+
+  updateCFDetails: async () => {
+    try {
+      const res = await axiosInstance.post(`${API_URL}/update-cf`, {}, { withCredentials: true });
+      useAuthStore.setState({ authUser: res.data });
+    } catch (error) {
+      console.error(error);
+    }
   },
 }));
