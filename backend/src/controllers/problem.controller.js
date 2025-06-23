@@ -157,6 +157,7 @@ export const refreshProblemStates = async (req, res) => {
     const userId = req.user._id;
     const user = await User.findById(userId);
     const handle = user.handle;
+
     const [resp, allProblems] = await Promise.all([
       fetch(`https://codeforces.com/api/user.status?handle=${handle}`),
       Problem.find({ userId }).lean(),
@@ -168,26 +169,49 @@ export const refreshProblemStates = async (req, res) => {
     }
 
     const solvedSet = new Set();
+    const ratingMap = new Map();
+
     for (const sub of data.result) {
       if (sub.verdict === "OK") {
         const key = `${sub.problem.contestId}${sub.problem.index}`;
         solvedSet.add(key);
+        if (sub.problem.rating) {
+          ratingMap.set(key, sub.problem.rating);
+        }
       }
     }
-   
+
     const toUpdate = [];
     const unsolvedProblems = [];
 
     for (const p of allProblems) {
       const key = p.contestID + p.problemIndex;
       let state = p.problemState;
+      let rating = p.problemRating;
+
       if (solvedSet.has(key)) {
         if (p.problemState !== "solved") {
-          // Mark as solved in DB if not already
           state = "solved";
-          toUpdate.push(p._id);
         }
       }
+
+      if (ratingMap.has(key)) {
+        const newRating = ratingMap.get(key);
+        if (p.problemRating !== newRating) {
+          rating = newRating;
+        }
+      }
+
+      if (state !== p.problemState || rating !== p.problemRating) {
+        toUpdate.push({
+          _id: p._id,
+          updates: {
+            ...(state !== p.problemState && { problemState: state }),
+            ...(rating !== p.problemRating && { problemRating: rating }),
+          },
+        });
+      }
+
       unsolvedProblems.push({
         _id: p._id,
         contestID: p.contestID,
@@ -196,17 +220,21 @@ export const refreshProblemStates = async (req, res) => {
         tags: p.tags,
         problemLink: p.problemLink,
         problemState: state,
-      })
+        problemRating: rating || null,
+      });
     }
 
     if (toUpdate.length > 0) {
-      await Problem.updateMany(
-        { _id: { $in: toUpdate } },
-        { $set: { problemState: "solved" } }
-      );
+      const bulkOps = toUpdate.map(({ _id, updates }) => ({
+        updateOne: {
+          filter: { _id },
+          update: { $set: updates },
+        },
+      }));
+      await Problem.bulkWrite(bulkOps);
     }
 
-    return res.status(200).json({unsolvedProblems});
+    return res.status(200).json({ unsolvedProblems });
   } catch (error) {
     console.error("Refresh error:", error.message);
     return res.status(500).json({ message: "Internal Server Error" });
