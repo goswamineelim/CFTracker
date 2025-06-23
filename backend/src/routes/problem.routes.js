@@ -1,5 +1,5 @@
 import express from "express";
-import { addProblem, deleteProblemByContestAndIndex, markSolve} from "../controllers/problem.controller.js";
+import { addProblem, deleteProblemByContestAndIndex, mark} from "../controllers/problem.controller.js";
 import { protectRoute } from "../middleware/isAuth.js";
 import { refreshProblemStates } from "../controllers/problem.controller.js";
 import { getAllProblems } from "../controllers/problem.controller.js";
@@ -13,6 +13,7 @@ router.delete("/delete", protectRoute, deleteProblemByContestAndIndex);
 router.post("/ref", protectRoute, refreshProblemStates);
 // returns all the problems
 router.get("/", protectRoute, getAllProblems);
-// marks specific problems as unsolved
-router.put('/mark', protectRoute, markSolve);
+// marks specific problems unsolved to solved or solved to unsolved
+router.put('/mark', protectRoute, mark);
+
 export default router;

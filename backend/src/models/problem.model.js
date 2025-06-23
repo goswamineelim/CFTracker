@@ -31,6 +31,10 @@ const problemSchema = new mongoose.Schema(
             type: [String],
             default: [],
         },
+          problemRating: {
+            type: Number,
+            default: null,
+        },
     },
     {timestamps: true}
 );

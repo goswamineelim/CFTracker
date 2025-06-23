@@ -44,7 +44,7 @@ export const addProblem = async (req, res) => {
 
     const name = matched ? matched.name : "Unknown Problem";
     const tags = matched?.tags || [];
-
+    const problemRating = matched?.rating ?? null; 
     const newProblem = new Problem({
       userId,
       contestID,
@@ -53,6 +53,7 @@ export const addProblem = async (req, res) => {
       problemState: "unsolved", // Unsolved
       name,
       tags,
+       problemRating, 
     });
 
     await newProblem.save();
@@ -66,6 +67,7 @@ export const addProblem = async (req, res) => {
         tags,
         problemLink,
         problemState: "unsolved",
+        problemRating, 
       },
     });
   } catch (error) {
@@ -74,28 +76,48 @@ export const addProblem = async (req, res) => {
   }
 };
 
-export const markSolve = async (req, res) => {
+export const mark = async (req, res) => {
   try {
     const { problemIndex, contestID } = req.body;
-    if(!problemIndex || !contestID) {
+
+    if (!problemIndex || !contestID) {
       return res.status(403).json({ message: "Problem Index or contest id missing" });
     }
+
     const userId = req.user._id;
-    await Problem.updateOne({
+
+    const problem = await Problem.findOne({
       userId: userId,
       contestID: contestID,
       problemIndex: problemIndex
-    },
-    {
-      $set: {
-        problemState : "solved"
-      }
     });
-    return res.status(200).json({message : "success"});
+
+    if (!problem) {
+      return res.status(404).json({ message: "Problem not found" });
+    }
+
+    const newState = problem.problemState === "solved" ? "unsolved" : "solved";
+
+    await Problem.updateOne(
+      {
+        userId: userId,
+        contestID: contestID,
+        problemIndex: problemIndex
+      },
+      {
+        $set: {
+          problemState: newState
+        }
+      }
+    );
+
+    return res.status(200).json({ message: `Problem marked as ${newState}` });
+
   } catch (error) {
     return res.status(500).json({ message: "Internal Server Error" });
   }
-}
+};
+
 
 //deletes problems by problem index and contest id of the problem
 
@@ -206,6 +228,7 @@ export const getAllProblems = async (req, res) => {
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
 
 
 
