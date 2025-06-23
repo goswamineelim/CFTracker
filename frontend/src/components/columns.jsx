@@ -79,6 +79,39 @@ export const columns = [
     enableHiding: true,
   },
   {
+    accessorKey: "problemRating",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Rating" />
+    ),
+    cell: ({ row }) => {
+      const rating = row.getValue("problemRating");
+
+      const getRatingClass = (rating) => {
+        if (!rating) return "text-gray-500"; // unrated
+        if (rating < 1200) return "text-gray-600";     // Newbie
+        if (rating < 1400) return "text-green-600";    // Pupil
+        if (rating < 1600) return "text-cyan-600";     // Specialist
+        if (rating < 1900) return "text-blue-600";     // Expert
+        if (rating < 2100) return "text-purple-700";   // Candidate Master
+        if (rating < 2300) return "text-orange-600";   // Master
+        if (rating < 2400) return "text-orange-500";   // IM
+        if (rating < 2600) return "text-red-600";      // GM
+        if (rating < 3000) return "text-red-700";      // IGM
+        return "text-red-900";                         // LGM
+      };
+
+      const colorClass = getRatingClass(rating);
+
+      return (
+        <span className={`px-2 py-0.5 text-xs font-semibold rounded-md border border-gray-300 ${colorClass}`}>
+          {rating ? rating : "Unrated"}
+        </span>
+      );
+    },
+    enableSorting: true,
+    enableHiding: true,
+  },
+  {
     id: "actions",
     cell: ({ row }) => <DataTableRowActions row={row} />,
   },
