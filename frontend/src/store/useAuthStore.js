@@ -1,5 +1,6 @@
 import {create} from "zustand";
 import { axiosInstance } from "../lib/axios";
+import toast from "react-hot-toast";
 
 const API_URL = "http://localhost:5000/api";
 
@@ -11,7 +12,6 @@ export const useAuthStore = create((set, get) => ({
     isUpdatingProfile: false,
     isValidating: false,
     loginGoogle: () => {
-        set({isLoggingIn: true});
         window.location.href = `${API_URL}/auth/google`;
     },
     signup: async (data) => {
@@ -20,7 +20,7 @@ export const useAuthStore = create((set, get) => ({
             const res = await axiosInstance.post(`${API_URL}/auth/signup`, data);
             return true;
         } catch(error){
-            console.error("Signup error ", error);
+            toast.error(error?.response?.data?.message);
             return false;
         } finally {
             set({isSigningUp: false});
@@ -32,7 +32,7 @@ export const useAuthStore = create((set, get) => ({
             const res = await axiosInstance.post(`${API_URL}/auth/resend`, { email });
             return true;
         } catch (error) {
-            console.error("Resend OTP error:", error);
+            toast.error(error?.response?.data?.message);
             return false;
         } finally {
             set({ isResending: false });
@@ -48,12 +48,12 @@ export const useAuthStore = create((set, get) => ({
             otp,
             email,
           });
-          console.log(res.data);
+          toast.success("Validation complete");
           // Set user on successful validation
           set({ authUser: res.data });
           return true;
         } catch (error) {
-            console.error("Validation error", error);
+            toast.error(error?.response?.data?.message);
             return false;
         } finally {            
             set({isValidating: false})
@@ -64,9 +64,10 @@ export const useAuthStore = create((set, get) => ({
         try{
             const res = await axiosInstance.post(`${API_URL}/auth/login`, data);
             set({authUser:res.data})
+            toast.success("Logged in successfully");
             return true;
         } catch(error){
-            console.error("Signup error ", error);
+            toast.error(error?.response?.data?.message);
             return false;
         } finally {
             set({isLoggingIn: false});
@@ -76,9 +77,10 @@ export const useAuthStore = create((set, get) => ({
         try{
             await axiosInstance.post(`${API_URL}/auth/logout`);
             set({authUser : null});
+            toast.success("Logged out successfully");
             return true;
         } catch(error){
-            console.error("Logout error ", error);
+            toast.error(error?.response?.data?.message);
             return false;
         }
     },
@@ -88,6 +90,7 @@ export const useAuthStore = create((set, get) => ({
             set({authUser: res.data});
         } catch(error){
             set({authUser: null});
+            // toast.error(error?.response?.data?.message);
         } finally {
             set({isLoggingIn: false});
             set({isSigningUp: false});

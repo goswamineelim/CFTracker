@@ -21,6 +21,8 @@ import {
 
 import { DataTableToolbar } from "./data-table-toolbar"
 import { DataTablePagination } from "./data-table-pagination"
+import { useState, useEffect } from "react"
+import { useTaskStore } from "@/store/useTaskStore"
 
 export function DataTable({ columns, data }) {
   const [rowSelection, setRowSelection] = React.useState({})
@@ -49,7 +51,16 @@ export function DataTable({ columns, data }) {
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
   })
-
+  const [loading, setLoading] = useState("No Results");
+  const {isFetching} = useTaskStore();
+  useEffect(()=>{
+    if(isFetching){
+      setLoading("Loading Problems.....")
+    }
+    else {
+      setLoading("No Result");
+    }
+  },[isFetching])
   return (
     <div className="space-y-4">
       {/* Top toolbar (filters, search, view toggles) */}
@@ -95,7 +106,7 @@ export function DataTable({ columns, data }) {
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  No results.
+                  {loading}
                 </TableCell>
               </TableRow>
             )}

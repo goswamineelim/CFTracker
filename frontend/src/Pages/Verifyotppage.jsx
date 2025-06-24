@@ -29,6 +29,9 @@ const InputOTP = React.forwardRef(({ className = "", containerClassName = "", ..
     {...props}
   />
 ));
+
+
+
 InputOTP.displayName = "InputOTP";
 
 const InputOTPSlot = React.forwardRef(({ index, className = "", ...props }, ref) => {
@@ -66,7 +69,7 @@ const FormSchema = z.object({
 export default function OTPPage() {
   const { state } = useLocation();
   const navigate = useNavigate();
-  const { email, username, password } = state || {}; 
+  const { email, username, password } = state || {};
 
   // Initialize OTP state
   const [otp, setOtp] = useState("");
@@ -79,26 +82,25 @@ export default function OTPPage() {
     },
   });
 
-const onSubmit = async (data) => {
+  const onSubmit = async (data) => {
 
-  try {
-    const validationResult = await validate({
-      email, 
-      username, 
-      password, 
-      otp: data.pin
-    });
-    if (validationResult) {
-      navigate("/");
-    } else {
-      console.error("Invalid OTP or Credentials!");
-      toast.error("Invalid OTP or Credentials!"); 
+    try {
+      const validationResult = await validate({
+        email,
+        username,
+        password,
+        otp: data.pin
+      });
+      if (validationResult) {
+        navigate("/");
+      } else {
+        toast.error("Invalid OTP or Credentials!");
+      }
+    } catch (error) {
+      console.error("Validation error", error);
+      toast.error("An error occurred during validation. Please try again later.");
     }
-  } catch (error) {
-    console.error("Validation error", error);
-    toast.error("An error occurred during validation. Please try again later.");
-  }
-};
+  };
 
   // OTP expiry timer logic
   const [timeLeft, setTimeLeft] = useState(0);
@@ -137,7 +139,13 @@ const onSubmit = async (data) => {
       setIsResending(false);
     }, 5000);
   };
+  const [verify, setVerify] = useState("Verify OTP");
+  const { isValidating } = useAuthStore();
 
+  useEffect(() => {
+    if (isValidating) setVerify("Verifying...");
+    else setVerify("Verify OTP");
+  }, [isValidating])
   return (
     <div className="flex min-h-screen flex-col items-center justify-center p-6 md:p-10">
       <div className="mb-6 flex items-center gap-2 font-medium text-lg">
@@ -189,7 +197,7 @@ const onSubmit = async (data) => {
               )}
             />
             <Button type="submit" className="w-full">
-              Submit
+              {verify}
             </Button>
           </form>
         </Form>

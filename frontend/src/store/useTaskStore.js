@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { axiosInstance } from "../lib/axios";
+import toast from 'react-hot-toast';
 
 const API_URL = "http://localhost:5000/api";
 
@@ -12,21 +13,22 @@ export const useTaskStore = create((set, get) => ({
         set({ isRefreshing: true });
         try {
             const res = await axiosInstance.post(`${API_URL}/problems/ref`);
-            set({problems : res.data.unsolvedProblems});
-            console.log(problems);
+            set({ problems: res.data.unsolvedProblems });
+            toast.success("Synced Successfully");
         } catch (error) {
-            // handle error
+            toast.error(error?.response?.data?.message);
         } finally {
             set({ isRefreshing: false });
         }
     },
-    markProblemAsSolved: async ({ problemIndex, contestID }) => {
+    markProblemAsSolved: async ({ problemIndex, contestID, problemState }) => {
         try {
             await axiosInstance.put(`${API_URL}/problems/mark`, {
                 problemIndex,
                 contestID,
             });
-
+            if (problemState === "solved") problemState = "unsolved";
+            else problemState = "solved";
             set((state) => {
                 const updatedProblems = state.problems.map((problem) => {
                     const match =
@@ -34,7 +36,7 @@ export const useTaskStore = create((set, get) => ({
                         String(problem.contestID) === String(contestID);
 
                     if (match) {
-                        return { ...problem, problemState: "solved" };
+                        return { ...problem, problemState };
                     }
 
                     return problem;
@@ -43,7 +45,9 @@ export const useTaskStore = create((set, get) => ({
                 return { problems: updatedProblems };
             });
         } catch (error) {
-            // handle error
+            toast.error(error?.response?.data?.message);
+        } finally {
+
         }
     },
     deleteProblems: async ({ problemIndex, contestID }) => {
@@ -65,8 +69,9 @@ export const useTaskStore = create((set, get) => ({
 
                 return { problems: updatedProblems };
             });
+            toast.success("Problem deleted Successfully");
         } catch (error) {
-
+            toast.error(error?.response?.data?.message);
         }
     },
     getProblems: async () => {
@@ -78,7 +83,7 @@ export const useTaskStore = create((set, get) => ({
             const rows = Array.isArray(res.data.problems) ? res.data.problems : Object.values(res.data.problems);
             set({ problems: rows })
         } catch (error) {
-            // handle error
+            toast.error(error?.response?.data?.message);
         } finally {
             set({ isFetching: false });
         }
@@ -87,16 +92,19 @@ export const useTaskStore = create((set, get) => ({
         set({ isAdding: true });
         try {
             const res = await axiosInstance.post(`${API_URL}/problems/add`, { problemLink: link });
-            if (res.status == 400) {
-                console.log("Invalid Problem");
-            }
             const addedProblem = res.data.problem;
             if (addedProblem) {
                 const current = get().problems;
                 set({ problems: [addedProblem, ...current] });
+                toast.success("Problem Added Successfully");
             }
         } catch (error) {
-
+            if (error.response?.status === 400) {
+                const msg = error.response?.data?.message || "Duplicate or Invalid Problem";
+                toast.error(msg);
+            } else {
+                toast.error("Failed to add problem.");
+            }
         } finally {
             set({ isAdding: false });
         }

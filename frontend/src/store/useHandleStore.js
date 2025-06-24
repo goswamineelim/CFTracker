@@ -2,6 +2,7 @@
 import { create } from "zustand";
 import { axiosInstance } from "@/lib/axios";
 import { useAuthStore } from "./useAuthStore";
+import toast from 'react-hot-toast';
 
 const API_URL = "http://localhost:5000/api/link-handle";
 export const useHandleStore = create((set, get) => ({
@@ -10,7 +11,6 @@ export const useHandleStore = create((set, get) => ({
   verificationStarted: false,
   isLinking: false,
   isValidating: false,
-  error: null,
 
   hydrateFromStorage: () => {
     const storedHandle = localStorage.getItem("cf_verification_handle");
@@ -37,9 +37,10 @@ export const useHandleStore = create((set, get) => ({
   },
 
   linkHandle: async (handle) => {
-    set({ isLinking: true, error: null });
+    set({ isLinking: true});
     try {
-      const res = await axiosInstance.post(`${API_URL}/link`, { handle });
+      await axiosInstance.post(`${API_URL}/validateIfExists`, { handle }); 
+      await axiosInstance.post(`${API_URL}/link`, { handle });
       const expiry = Date.now() + 2 * 60 * 1000; // 2 minutes
       localStorage.setItem("cf_verification_handle", handle);
       localStorage.setItem("cf_verification_expiry", expiry.toString());
@@ -50,7 +51,7 @@ export const useHandleStore = create((set, get) => ({
       });
       return true;
     } catch (error) {
-      set({ error: error?.response?.data?.message || "Error linking handle" });
+      toast.error(error?.response?.data?.message || "Something went wrong while linking handle.");
       return false;
     } finally {
       set({ isLinking: false });
@@ -58,41 +59,35 @@ export const useHandleStore = create((set, get) => ({
   },
 
   validateHandle: async () => {
-    set({ isValidating: true, error: null });
+    set({ isValidating: true});
     try {
       const res = await axiosInstance.post(`${API_URL}/validate`, {
         handle: get().handle,
       });
-      console.log(res);
       get().clearVerification();
+      toast.success("Handle linked");
       return true;
     } catch (error) {
-      console.log(error);
-      set({
-        error: error?.response?.data?.message || "Error validating handle",
-      });
+      toast.error(error?.response?.data?.message);
       return false;
     } finally {
       set({ isValidating: false });
     }
   },
   disconnectHandle: async () => {
-    set({ isValidating: true, error: null });
+    set({ isValidating: true });
     try {
       await axiosInstance.post(`${API_URL}/disconnect`);
       get().clearVerification();
+      toast.success("Handle Disconnected");
       return true;
     } catch (error) {
-      console.error(error);
-      set({
-        error: error?.response?.data?.message || "Error disconnecting handle",
-      });
+      toast.error(error?.response?.data?.message);
       return false;
     } finally {
       set({ isValidating: false });
     }
   },
-
   clearVerification: () => {
     localStorage.removeItem("cf_verification_handle");
     localStorage.removeItem("cf_verification_expiry");
@@ -100,7 +95,6 @@ export const useHandleStore = create((set, get) => ({
       handle: null,
       expiry: null,
       verificationStarted: false,
-      error: null,
     });
   },
 
@@ -108,8 +102,9 @@ export const useHandleStore = create((set, get) => ({
     try {
       const res = await axiosInstance.post(`${API_URL}/update-cf`, {}, { withCredentials: true });
       useAuthStore.setState({ authUser: res.data });
+      toast.success("Details Updated");
     } catch (error) {
-      console.error(error);
+      toast.error(error?.response?.data?.message);
     }
   },
 }));

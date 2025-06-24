@@ -6,7 +6,7 @@ import { useAuthStore } from '@/store/useAuthStore.js'
 import { useEffect } from 'react';
 import SignUppage from "@/Pages/SignUppage.jsx"
 import VerifyOtp from "@/Pages/Verifyotppage.jsx"
-
+import { Toaster } from 'react-hot-toast';
 
 export default function App() {
   const {authUser, getUser} = useAuthStore();
@@ -23,6 +23,8 @@ export default function App() {
         <Route path="/signup" element={<SignUppage/>}/>
         <Route path="/verify-otp" element={<VerifyOtp />} />
       </Routes>
+
+      <Toaster />
     </>
   )
 }
