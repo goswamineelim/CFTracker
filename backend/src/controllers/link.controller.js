@@ -78,7 +78,7 @@ export const validate = async (req, res) => {
                 if (startTime <= subProb.creationTimeSeconds) {
                     
                     await User.findByIdAndUpdate(userId, { handle }, { new: true });
-                    await fetchAndStoreCFDetails(req,res,handle);
+                    await fetchAndStoreCFDetails(userId,handle);
 
                     clearTimeout(tracked.timeoutId);
                     delete signupTracker[handle];

@@ -56,10 +56,17 @@ export default function VerifyHandlePopup({
     const success = await validateHandle();
     if (success)
         {
-            onClose(false);
-            await getUser();
+          onClose(false);
+          await getUser();
         } 
   };
+  const {isValidating} = useHandleStore();
+  const [verify, setVerify] = useState("Verify Now");
+
+  useEffect(() => {
+    if(isValidating) setVerify("Verifying...")
+    else setVerify("Verify Now");
+  }, [isValidating])
 
   return (
     
@@ -134,7 +141,13 @@ export default function VerifyHandlePopup({
 
         <DialogFooter className="flex justify-end pt-4">
           <Button onClick={() => onClose(false)} variant="outline">Cancel</Button>
-          <Button onClick={handleVerifyNow}>Verify Now</Button>
+          <Button disabled={isValidating}
+                    className={(
+                      "w-full transition-colors",
+                      isValidating
+                        ? "bg-gray-400 text-white cursor-not-allowed"
+                        : "bg-primary text-white hover:bg-primary/90"
+                    )} onClick={handleVerifyNow}>{verify}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

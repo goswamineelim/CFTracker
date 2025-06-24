@@ -52,7 +52,7 @@ export const login = async (req, res) => {
             return res.status(400).json({ message: "Invalid credentials or unverified account" });
 
         const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) return res.status(400).json({ message: "Incorrect password" });
+        if (!isMatch) return res.status(400).json({ message: "Invalid credentials or unverified account" });
 
         generateToken(user._id, res);
 
