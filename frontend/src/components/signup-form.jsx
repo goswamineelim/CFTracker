@@ -13,32 +13,32 @@ export function SignupForm({
   const navigate = useNavigate();
   const { signup, loginGoogle, isSigningUp } = useAuthStore();
   async function handleSubmit(formData) {
-  const data = {
-    username: formData.get("username"),
-    email: formData.get("email"),
-    password: formData.get("password"),
-  };
+    const data = {
+      username: formData.get("username"),
+      email: formData.get("email"),
+      password: formData.get("password"),
+    };
 
-  const result = await signup(data);
+    const result = await signup(data);
 
-  if (result) {
-    navigate("/verify-otp", {
-      state: data, 
-    });
-  } else {
-    console.error("Invalid Input: Signup failed");
+    if (result) {
+      navigate("/verify-otp", {
+        state: data,
+      });
+    } else {
+      console.error("Invalid Input: Signup failed");
+    }
   }
-}
 
   const handleLoginWithGoogle = (e) => {
     e.preventDefault();
     loginGoogle();
   }
   const [text, setText] = useState("Create Account");
-    useEffect (() => {
-      if(isSigningUp) setText("Signing Up...")
-      else setText("Create Account");
-    }, [isSigningUp])
+  useEffect(() => {
+    if (isSigningUp) setText("Signing Up...")
+    else setText("Create Account");
+  }, [isSigningUp])
   return (
     <form className={cn("flex flex-col gap-6", className)} {...props} action={handleSubmit}>
       <div className="flex flex-col items-center gap-2 text-center">
@@ -62,7 +62,13 @@ export function SignupForm({
           </div>
           <Input id="password" name="password" type="password" placeholder="******" required />
         </div>
-        <Button type="submit" className="w-full">
+        <Button disabled={isSigningUp}
+          className={cn(
+            "w-full transition-colors",
+            isSigningUp
+              ? "bg-gray-400 text-white cursor-not-allowed"
+              : "bg-primary text-white hover:bg-primary/90"
+          )} type="submit">
           {text}
         </Button>
         <div

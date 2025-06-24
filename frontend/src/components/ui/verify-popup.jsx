@@ -141,7 +141,13 @@ export default function VerifyHandlePopup({
 
         <DialogFooter className="flex justify-end pt-4">
           <Button onClick={() => onClose(false)} variant="outline">Cancel</Button>
-          <Button onClick={handleVerifyNow}>{verify}</Button>
+          <Button disabled={isValidating}
+                    className={(
+                      "w-full transition-colors",
+                      isValidating
+                        ? "bg-gray-400 text-white cursor-not-allowed"
+                        : "bg-primary text-white hover:bg-primary/90"
+                    )} onClick={handleVerifyNow}>{verify}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

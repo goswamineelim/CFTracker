@@ -51,7 +51,13 @@ export function LoginForm({
           </div>
           <Input id="password" name="password" type="password" placeholder="******" required />
         </div>
-        <Button type="submit" className="w-full" >
+        <Button disabled={isLoggingIn}
+          className={cn(
+            "w-full transition-colors",
+            isLoggingIn
+              ? "bg-gray-400 text-white cursor-not-allowed"
+              : "bg-primary text-white hover:bg-primary/90"
+          )} type="submit">
           {text}
         </Button>
         <div
