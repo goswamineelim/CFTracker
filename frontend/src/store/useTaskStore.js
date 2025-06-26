@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { axiosInstance } from "../lib/axios";
 import toast from 'react-hot-toast';
 
-const API_URL = "http://localhost:5000/api";
+const API_URL = "/api";
 
 export const useTaskStore = create((set, get) => ({
     problems: {},

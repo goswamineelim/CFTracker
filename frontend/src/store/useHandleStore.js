@@ -4,7 +4,7 @@ import { axiosInstance } from "@/lib/axios";
 import { useAuthStore } from "./useAuthStore";
 import toast from 'react-hot-toast';
 
-const API_URL = "http://localhost:5000/api/link-handle";
+const API_URL = "/api/link-handle";
 export const useHandleStore = create((set, get) => ({
   handle: null,
   expiry: null, // in ms timestamp

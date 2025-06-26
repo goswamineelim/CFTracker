@@ -13,10 +13,10 @@ router.get('/google', passport.authenticate('google', {
 
 // google redirects back here and we get the information we needed from google and we generate our own jwt token and do stateless authentication
 router.get('/google/callback',
-    passport.authenticate('google', { session: false, failureRedirect: 'http://localhost:5173/login?error=email_exists' }),
+    passport.authenticate('google', { session: false, failureRedirect: '/login?error=email_exists' }),
     (req, res) => {
         generateToken(req.user._id, res);
-        res.redirect('http://localhost:5173/');
+        res.redirect('/');
     }
 );
 
