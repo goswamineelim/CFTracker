@@ -8,6 +8,7 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import './lib/google.js';
 import passport from 'passport';
+import path from "path";
 
 const app = express();
 
@@ -15,7 +16,7 @@ dotenv.config();
 app.get("/", (req, res) => {
   res.send({ "message": "Welcome to server" });
 });
-
+const __dirname = path.resolve();
 app.use(express.json());
 
 app.use(passport.initialize());
@@ -34,6 +35,13 @@ app.use("/api/link-handle", linkRoute)
 
 
 const PORT = process.env.PORT;
+
+if(process.env.NODE_ENV === "production"){
+  app.use(express.static(path.join(__dirname, "/frontend/dist")));
+  app.get("*", (req, res)=>{
+    res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
+  })
+}
 
 app.listen(PORT, () => {
   console.log(`http://localhost:${PORT}`);
