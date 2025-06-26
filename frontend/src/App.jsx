@@ -9,7 +9,7 @@ import VerifyOtp from "@/Pages/Verifyotppage.jsx"
 import { Toaster } from 'react-hot-toast';
 
 export default function App() {
-  const {authUser, getUser} = useAuthStore();
+  const {authUser, getUser, isValidating} = useAuthStore();
 
   useEffect(() => {
     getUser(); // Get user on app load
@@ -19,9 +19,9 @@ export default function App() {
     <>
       <Routes>
         <Route path="/" element={authUser !== null ? <Homepage/> : <LoginPage />}/>
-        <Route path="/login" element={<LoginPage/>}/>
-        <Route path="/signup" element={<SignUppage/>}/>
-        <Route path="/verify-otp" element={<VerifyOtp />} />
+        <Route path="/login" element={authUser === null ? <LoginPage/> : <Homepage/>}/>
+        <Route path="/signup" element={authUser === null ? <SignUppage/> : <Homepage/>}/>
+        <Route path="/verify-otp" element={isValidating ? <VerifyOtp /> : <Homepage />} />
       </Routes>
 
       <Toaster />
