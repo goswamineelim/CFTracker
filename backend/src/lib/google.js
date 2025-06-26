@@ -6,7 +6,7 @@ dotenv.config();
 passport.use(new GoogleStrategy({
   clientID: process.env.CLIENT_ID,
   clientSecret: process.env.CLIENT_SECRET,
-  callbackURL: 'http://localhost:5000/api/auth/google/callback',
+  callbackURL: 'https://cftracker.onrender.com/api/auth/google/callback',
 },
 async function (accessToken, refreshToken, profile, cb) {
   try {
