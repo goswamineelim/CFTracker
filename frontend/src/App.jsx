@@ -21,7 +21,7 @@ export default function App() {
         <Route path="/" element={authUser !== null ? <Homepage/> : <LoginPage />}/>
         <Route path="/login" element={authUser === null ? <LoginPage/> : <Homepage/>}/>
         <Route path="/signup" element={authUser === null ? <SignUppage/> : <Homepage/>}/>
-        <Route path="/verify-otp" element={isValidating ? <VerifyOtp /> : <Homepage />} />
+        <Route path="/verify-otp" element={<VerifyOtp />} />
       </Routes>
 
       <Toaster />
