@@ -77,58 +77,40 @@ export function DataTableToolbar({ table }) {
     return (
       <>
         {/* Toolbar for all screens, compact on mobile */}
-        <div className="flex items-center justify-between w-full flex-wrap gap-2 md:gap-0">
-          <div className="flex flex-1 items-center space-x-2 min-w-0">
-            <Input
-              placeholder="Filter by name..."
-              value={table.getColumn("name")?.getFilterValue() ?? ""}
-              onChange={(event) =>
-                table.getColumn("name")?.setFilterValue(event.target.value)
-              }
-              className="h-8 w-24 text-xs md:w-36 md:text-sm lg:w-60"
-            />
-            {table.getColumn("problemState") && (
-              <DataTableFacetedFilter
-                column={table.getColumn("problemState")}
-                title="State"
-                options={[
-                  { label: "Solved", value: "solved" },
-                  { label: "Unsolved", value: "unsolved" },
-                ]}
-                className="text-xs md:text-sm"
-              />
-            )}
-            {table.getColumn("tags") && (
-              <DataTableFacetedFilter
-                column={table.getColumn("tags")}
-                title="Tags"
-                options={
-                  allTags.length > 0
-                    ? allTags.map((tag) => ({
-                        label: tag,
-                        value: tag,
-                      }))
-                    : []
-                }
-                className="text-xs md:text-sm"
-              />
-            )}
-            {isFiltered && (
-              <Button
-                variant="ghost"
-                onClick={() => table.resetColumnFilters()}
-                className="h-8 px-2 text-xs md:text-sm lg:px-3"
-              >
-                Reset
-                <X className="ml-1 h-4 w-4" />
-              </Button>
-            )}
-          </div>
-          {/* More Options button for all screens, only visible on mobile */}
-          <div className="flex md:hidden items-center justify-end">
+        <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between w-full flex-wrap gap-2 md:gap-0">
+          {/* Mobile: Top row with State, Tags left; More right; above filter by name */}
+          <div className="flex md:hidden items-center justify-between w-full mb-1">
+            <div className="flex flex-row flex-wrap items-center gap-1">
+              {table.getColumn("problemState") && (
+                <DataTableFacetedFilter
+                  column={table.getColumn("problemState")}
+                  title="State"
+                  options={[
+                    { label: "Solved", value: "solved" },
+                    { label: "Unsolved", value: "unsolved" },
+                  ]}
+                  className="text-xs"
+                />
+              )}
+              {table.getColumn("tags") && (
+                <DataTableFacetedFilter
+                  column={table.getColumn("tags")}
+                  title="Tags"
+                  options={
+                    allTags.length > 0
+                      ? allTags.map((tag) => ({
+                          label: tag,
+                          value: tag,
+                        }))
+                      : []
+                  }
+                  className="text-xs"
+                />
+              )}
+            </div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="icon" className="h-8 w-8">
+                <Button variant="outline" size="icon" className="h-8 w-8 ml-auto">
                   <span className="sr-only">More Options</span>
                   <MoreHorizontal className="h-4 w-4" />
                 </Button>
@@ -167,41 +149,72 @@ export function DataTableToolbar({ table }) {
                 </div>
               </DropdownMenuContent>
             </DropdownMenu>
-            {/* Dialog for Add Problem */}
-            <Dialog open={open} onOpenChange={setOpen}>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Add New Problem</DialogTitle>
-                  <DialogDescription>
-                    Paste the Codeforces problem link you want to add.
-                  </DialogDescription>
-                </DialogHeader>
-                <Input
-                  placeholder="https://codeforces.com/problemset/problem/1234/A"
-                  value={link}
-                  onChange={(e) => setLink(e.target.value)}
-                />
-                <DialogFooter className="flex justify-between">
-                  <Button onClick={handleSubmit}>Add</Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
           </div>
-          {/* Add Problem, Refresh, and View for md+ screens */}
-          <div className="hidden md:flex items-center gap-2">
+          {/* Left group: filters (desktop) and filter by name (mobile below filters) */}
+          <div className="flex flex-col flex-1 min-w-0 gap-2 md:flex-row md:items-center md:space-x-1 md:gap-1">
+            <Input
+              placeholder="Filter by name..."
+              value={table.getColumn("name")?.getFilterValue() ?? ""}
+              onChange={(event) =>
+                table.getColumn("name")?.setFilterValue(event.target.value)
+              }
+              className="h-8 w-full text-xs md:w-36 md:text-sm lg:w-60 md:mt-0 md:px-[10px] md:mr-0"
+            />
+            <div className="hidden md:flex flex-row flex-wrap items-center gap-1">
+              {table.getColumn("problemState") && (
+                <DataTableFacetedFilter
+                  column={table.getColumn("problemState")}
+                  title="State"
+                  options={[
+                    { label: "Solved", value: "solved" },
+                    { label: "Unsolved", value: "unsolved" },
+                  ]}
+                  className="text-xs md:text-sm"
+                />
+              )}
+              {table.getColumn("tags") && (
+                <DataTableFacetedFilter
+                  column={table.getColumn("tags")}
+                  title="Tags"
+                  options={
+                    allTags.length > 0
+                      ? allTags.map((tag) => ({
+                          label: tag,
+                          value: tag,
+                        }))
+                      : []
+                  }
+                  className="text-xs md:text-sm"
+                />
+              )}
+              {isFiltered && (
+                <Button
+                  variant="ghost"
+                  onClick={() => table.resetColumnFilters()}
+                  className="h-8 px-2 text-xs md:text-sm lg:px-3"
+                >
+                  Reset
+                  <X className="ml-1 h-4 w-4" />
+                </Button>
+              )}
+            </div>
+          </div>
+          {/* Right group: actions (desktop only) */}
+          <div className="hidden md:flex items-center gap-1">
             <Dialog open={open} onOpenChange={setOpen}>
               <DialogTrigger asChild>
                 <Button
-                  className="h-8 w-8"
+                  variant="outline"
                   size="icon"
+                  className="h-8 w-8"
                   onClick={() => setOpen(true)}
                 >
-                  <Plus className="h-4 w-4 text-black" />
+                  <Plus className="h-4 w-4" />
                   <span className="sr-only">Add Problem</span>
                 </Button>
               </DialogTrigger>
-              <Button onClick={refresh} size = "icon" className="h-8 w-8 gap-2">
-                <RotateCcw className={`h-4 w-4 text-black ${isRefreshing ? "animate-spin" : ""}`} />
+              <Button onClick={refresh} size = "icon" variant="outline" className="h-8 w-8 gap-2">
+                <RotateCcw className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`} />
               </Button>
               <DialogContent>
                 <DialogHeader>
@@ -220,7 +233,6 @@ export function DataTableToolbar({ table }) {
                 </DialogFooter>
               </DialogContent>
             </Dialog>
-            {/* View button for desktop */}
             <DataTableViewOptions table={table} />
           </div>
         </div>
