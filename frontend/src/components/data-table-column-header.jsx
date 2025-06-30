@@ -14,11 +14,11 @@ export function DataTableColumnHeader({ column, title, className }) {
   const isSorted = column.getIsSorted()
 
   if (!canSort) {
-    return <div className={cn(className)}>{title}</div>
+    return <div className={cn("font-medium text-sm", className)}>{title}</div>
   }
 
   return (
-    <div className={cn("flex items-center space-x-2", className)}>
+    <div className={cn("flex items-center space-x-2 font-medium text-sm", className)}>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
@@ -26,7 +26,7 @@ export function DataTableColumnHeader({ column, title, className }) {
             size="sm"
             className="-ml-3 h-8 data-[state=open]:bg-accent"
           >
-            <span>{title}</span>
+            <span className="font-medium text-sm">{title}</span>
             {isSorted === "desc" ? (
               <ArrowDown className="ml-2 h-4 w-4" />
             ) : isSorted === "asc" ? (

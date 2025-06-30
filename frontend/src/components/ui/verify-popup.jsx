@@ -71,9 +71,9 @@ export default function VerifyHandlePopup({
   return (
     
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="w-full max-w-xs sm:max-w-md md:max-w-2xl max-h-[90vh] overflow-y-auto pt-10 p-2 sm:p-4" showCloseButton={true}>
         <DialogHeader>
-          <DialogTitle>Verify your Codeforces Handle</DialogTitle>
+          <DialogTitle className="text-base sm:text-sm mt-2">Verify your Codeforces Handle</DialogTitle>
           <DialogDescription>
             Submit a compilation error to complete verification.
           </DialogDescription>
@@ -82,7 +82,7 @@ export default function VerifyHandlePopup({
         <div className="space-y-2 text-sm leading-relaxed">
           <div className="text-center text-muted-foreground">
             <div className="font-medium text-base">Codeforces Handle:</div>
-            <div className="text-primary font-semibold">{handle}</div>
+            <div className="text-primary font-semibold break-words">{handle}</div>
           </div>
 
           <div className="flex flex-col items-center gap-1 text-muted-foreground">
@@ -110,19 +110,8 @@ export default function VerifyHandlePopup({
               and submit the provided code using your handle{" "}
               <span className="font-semibold">{handle}</span>.
             </div>
-            <pre className="relative bg-muted p-3 rounded-md text-sm overflow-auto border">
-              <code>{providedCode}</code>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={handleCopy}
-                className="absolute top-2 right-2 p-1"
-              >
-                <Copy className="w-4 h-4" />
-              </Button>
-              {copied && (
-                <span className="absolute bottom-2 right-2 text-xs text-green-500">Copied!</span>
-              )}
+            <pre className="relative bg-muted p-2 sm:p-3 rounded-md text-sm sm:text-xs overflow-auto border break-words whitespace-pre-wrap max-w-full">
+              <code className="break-words whitespace-pre-wrap max-w-full">{providedCode}</code>
             </pre>
           </div>
 
@@ -139,11 +128,10 @@ export default function VerifyHandlePopup({
           </div>
         </div>
 
-        <DialogFooter className="flex justify-end pt-4">
-          <Button onClick={() => onClose(false)} variant="outline">Cancel</Button>
+        <DialogFooter className="flex flex-col sm:flex-row justify-end pt-4 gap-2">
           <Button disabled={isValidating}
                     className={(
-                      "w-full transition-colors",
+                      "w-full sm:w-auto transition-colors",
                       isValidating
                         ? "bg-gray-400 text-white cursor-not-allowed"
                         : "bg-primary text-white hover:bg-primary/90"

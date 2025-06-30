@@ -147,15 +147,15 @@ export default function OTPPage() {
     else setVerify("Verify OTP");
   }, [isValidating])
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center p-6 md:p-10">
-      <div className="mb-6 flex items-center gap-2 font-medium text-lg">
+    <div className="flex min-h-screen flex-col items-center justify-center p-4 sm:p-2 md:p-10 w-full max-w-md sm:max-w-xs mx-auto">
+      <div className="mb-6 flex items-center gap-2 font-medium text-lg sm:text-base">
         <div className="bg-primary text-primary-foreground flex size-6 items-center justify-center rounded-md">
           <FaLock size={15} />
         </div>
         Verify OTP
       </div>
 
-      <div className="w-full max-w-xs space-y-6">
+      <div className="w-full space-y-6">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <FormField
@@ -165,16 +165,18 @@ export default function OTPPage() {
                 <FormItem>
                   <FormLabel>One-Time Password</FormLabel>
                   <FormControl>
-                    <InputOTP maxLength={6} {...field}>
-                      <InputOTPGroup>
-                        <InputOTPSlot index={0} />
-                        <InputOTPSlot index={1} />
-                        <InputOTPSlot index={2} />
-                        <InputOTPSlot index={3} />
-                        <InputOTPSlot index={4} />
-                        <InputOTPSlot index={5} />
-                      </InputOTPGroup>
-                    </InputOTP>
+                    <div className="flex flex-wrap justify-center gap-2 w-full">
+                      <InputOTP maxLength={6} {...field} className="w-full">
+                        <InputOTPGroup>
+                          <InputOTPSlot index={0} className="h-10 w-10 sm:h-8 sm:w-8 text-lg sm:text-base" />
+                          <InputOTPSlot index={1} className="h-10 w-10 sm:h-8 sm:w-8 text-lg sm:text-base" />
+                          <InputOTPSlot index={2} className="h-10 w-10 sm:h-8 sm:w-8 text-lg sm:text-base" />
+                          <InputOTPSlot index={3} className="h-10 w-10 sm:h-8 sm:w-8 text-lg sm:text-base" />
+                          <InputOTPSlot index={4} className="h-10 w-10 sm:h-8 sm:w-8 text-lg sm:text-base" />
+                          <InputOTPSlot index={5} className="h-10 w-10 sm:h-8 sm:w-8 text-lg sm:text-base" />
+                        </InputOTPGroup>
+                      </InputOTP>
+                    </div>
                   </FormControl>
 
                   <div className="flex justify-between items-center text-sm text-muted-foreground mt-1">
@@ -202,7 +204,7 @@ export default function OTPPage() {
           </form>
         </Form>
 
-        <div className="text-center text-sm text-muted-foreground mt-2">
+        <div className="text-center text-sm sm:text-xs text-muted-foreground mt-2">
           Time remaining: {minutes}:{seconds < 10 ? `0${seconds}` : seconds}
         </div>
       </div>

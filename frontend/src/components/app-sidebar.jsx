@@ -71,17 +71,22 @@ export function AppSidebar(props) {
       </SidebarContent>
 
 
-      <SidebarFooter>
-        {authUser?.handle ? <NavHandle user={{
-          handle: authUser.handle,
-          rating: "Rating"
-        }
-        } setPopupOpen={setPopupOpen} checkValue={true} /> :
-          <NavHandle user={{
-            handle:verificationStarted? "Verify Handle":"Connect Codeforces",
+      <SidebarFooter className="block w-full flex flex-col items-stretch gap-2 md:static md:bottom-auto md:left-auto md:right-auto md:z-auto bg-sidebar border-t border-border p-2">
+        <div className="w-full">
+          {authUser?.handle ? <NavHandle user={{
+            handle: authUser.handle,
+            rating: "Rating"
           }
-          } setPopupOpen={setPopupOpen} checkValue={false} />
-        }
+          } setPopupOpen={setPopupOpen} checkValue={true} /> :
+            <NavHandle user={{
+              handle:verificationStarted? "Verify Handle":"Connect Codeforces",
+            }
+            } setPopupOpen={setPopupOpen} checkValue={false} />
+          }
+        </div>
+        <div className="w-full md:w-auto">
+          <NavUser user={authUser} />
+        </div>
       </SidebarFooter>
 
       {popupOpen && (
@@ -109,12 +114,6 @@ export function AppSidebar(props) {
           )}
         </>
       )}
-
-
-
-      <SidebarFooter>
-        <NavUser user={authUser} />
-      </SidebarFooter>
 
       <SidebarRail />
     </Sidebar>

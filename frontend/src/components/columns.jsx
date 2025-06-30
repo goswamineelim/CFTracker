@@ -11,7 +11,7 @@ export const columns = [
     cell: ({ row }) => {
       const { contestID, problemIndex } = row.original || {}
       return (
-        <div className="w-[80px]">
+        <div className="w-20 md:w-24">
           {contestID}{problemIndex}
         </div>
       )
@@ -26,7 +26,7 @@ export const columns = [
     ),
     cell: ({ row }) => (
       <div className="flex space-x-2">
-        <span className="max-w-[500px] truncate font-medium">
+        <span className="max-w-xs md:max-w-lg truncate font-medium">
           {row.getValue("name")}
         </span>
       </div>
@@ -61,7 +61,7 @@ export const columns = [
     cell: ({ row }) => {
       const tags = row.getValue("tags") ?? []
       return (
-        <div className="flex flex-wrap gap-1 max-w-[300px]">
+        <div className="flex flex-wrap gap-1 max-w-xs md:max-w-md">
           {tags.map((tag, index) => (
             <Badge key={index} variant="secondary" className="text-xs">
               {tag}

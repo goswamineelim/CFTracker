@@ -12,9 +12,11 @@ export default function Problems() {
     }, [])
     return (
         <>
-            <div className="p-4">
-                <h1 className="text-xl font-bold mb-4">Your Problem List</h1>
-                <DataTable columns={columns} data={Object.values(problems)} />
+            <div className="p-4 sm:p-2 w-full max-w-full overflow-x-auto">
+                <h1 className="text-lg sm:text-base xs:text-sm font-bold mb-4">Your Problem List</h1>
+                <div className="w-full max-w-full overflow-x-auto">
+                  <DataTable columns={columns} data={Object.values(problems)} />
+                </div>
             </div>
         </>
     )
